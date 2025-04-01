@@ -4,7 +4,9 @@
 2) Multiple test groups are desired
 3) A practically significant effect size is known
 
-Given a population size, number of test groups, desired effect size, desired test power, and known variance(s), the calculator determines how large of a test group size is optimal. Note that if adding individuals to the test group is just as costly as control, then this calculator has no real purpose -- balanced groups is ideal in that case.
+Given a population size, number of test groups, desired effect size, desired test power, and known variance(s), the calculator determines how large of a test group size is optimal. Note that if adding individuals to the test group is just as costly as control, then this calculator has no real purpose -- balanced groups is ideal in that case. 
+
+Access the calculator here: https://jasonpremo.github.io/stats-tools/sample-size-calculator.html
 
 * optimal_sample_size.ipynb: The original, python function version of the calculator above.
 
