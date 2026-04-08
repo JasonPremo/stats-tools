@@ -12,3 +12,5 @@ Access the calculator here: https://jasonpremo.github.io/stats-tools/sample-size
 
 * sensitivity_analysis_sanitized.xlsx: A sanitized version of an excel sheet used to do sensitivity analysis for an encouragement design experiment.
 * sensitivity_analysis_math.pdf: Some math proving that the power calculations done the in the above spreadsheet are correct.
+
+* survey_maker: A little survey maker I built with the help of Claude. You can make a survey (stored as a yaml file) and host it on a flask server. There's a little tool to help build the surveys as well.
