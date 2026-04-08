@@ -1,0 +1,457 @@
+survey:
+  title: "Transportation Survey"
+  description: "Thank you for taking our survey about transportation habits."
+
+  pages:
+
+    - id: page_background
+      title: "Background"
+      description: "First, a few questions about you."
+      questions:
+
+        - id: q_employment
+          label: employment_status
+          type: radio
+          text: "What is your current employment status?"
+          required: true
+          options:
+            - value: employed
+              text: "Employed full-time"
+            - value: part_time
+              text: "Employed part-time"
+            - value: student
+              text: "Student"
+            - value: retired
+              text: "Retired"
+            - value: other
+              text: "Other"
+
+        - id: q_age
+          label: age
+          type: number
+          text: "What is your age?"
+          min: 16
+          max: 100
+          integer_only: true
+
+        - id: q_commute_days
+          label: commute_days_per_week
+          type: number
+          text: "How many days per week do you commute to a workplace?"
+          min: 0
+          max: 7
+          integer_only: true
+          display_if:
+            question: q_employment
+            operator: equals
+            value: employed
+
+        - id: q_region
+          label: region
+          type: dropdown
+          text: "Which region do you live in?"
+          required: true
+          options:
+            - value: northeast
+              text: "Northeast"
+            - value: midwest
+              text: "Midwest"
+            - value: south
+              text: "South"
+            - value: west
+              text: "West"
+            - value: other
+              text: "Other / Outside the US"
+
+    - id: page_transport_modes
+      title: "How You Get Around"
+      questions:
+
+        - id: q_transport_modes
+          type: checkbox
+          label: transport_mode
+          text: "Which of the following do you use regularly to get around? Select all that apply."
+          required: true
+          notes: "**'Regularly'** means *at least once a week* on average. Include modes you use for any purpose — commuting, errands, leisure, etc."
+          options:
+            - value: car
+              text: "Personal car"
+            - value: carpool
+              text: "Carpool / rideshare with others"
+            - value: bus
+              text: "Bus or subway"
+            - value: train
+              text: "Commuter rail or intercity train"
+            - value: bike
+              text: "Bicycle"
+            - value: walk
+              text: "Walking"
+            - value: rideshare
+              text: "App-based rideshare (Uber, Lyft)"
+            - value: other
+              text: "Other"
+
+        - id: q_car_type
+          label: car_type
+          type: dropdown
+          text: "What type of vehicle do you primarily drive?"
+          display_if:
+            question: q_transport_modes
+            operator: includes
+            value: car
+          options:
+            - value: sedan
+              text: "Sedan or coupe"
+            - value: suv
+              text: "SUV or crossover"
+            - value: truck
+              text: "Truck"
+            - value: minivan
+              text: "Minivan"
+            - value: electric
+              text: "Electric vehicle"
+            - value: hybrid
+              text: "Hybrid"
+
+        - id: q_car_ownership
+          label: car_ownership
+          type: radio
+          text: "Do you own or lease your vehicle?"
+          display_if:
+            question: q_transport_modes
+            operator: includes
+            value: car
+          options:
+            - value: own
+              text: "Own"
+            - value: lease
+              text: "Lease"
+            - value: neither
+              text: "Neither (borrowing, company car, etc.)"
+
+        - id: q_bike_type
+          label: bike_type
+          type: radio
+          text: "What kind of bicycle do you primarily use?"
+          display_if:
+            question: q_transport_modes
+            operator: includes
+            value: bike
+          options:
+            - value: regular
+              text: "Regular bicycle"
+            - value: ebike
+              text: "E-bike"
+            - value: shared
+              text: "Shared / docked bike (e.g. Divvy, Citi Bike)"
+
+        - id: q_transport_satisfaction
+          label: transport_satisfaction
+          type: rating
+          text: "Overall, how satisfied are you with your current transportation options?"
+          min: 1
+          max: 5
+          min_label: "Very dissatisfied"
+          max_label: "Very satisfied"
+
+
+    - id: page_commuting
+      title: "Commuting Details"
+      description: "This page only appears if you are employed full-time or part-time."
+      display_if:
+        operator: or
+        conditions:
+          - question: q_employment
+            operator: equals
+            value: employed
+          - question: q_employment
+            operator: equals
+            value: part_time
+      questions:
+
+        - id: q_commute_mode
+          label: commute_primary_mode
+          type: radio
+          text: "What is your primary mode of transport for commuting to work?"
+          required: true
+          options:
+            - value: car
+              text: "Personal car"
+            - value: carpool
+              text: "Carpool"
+            - value: transit
+              text: "Public transit"
+            - value: bike
+              text: "Bicycle"
+            - value: walk
+              text: "Walking"
+            - value: remote
+              text: "I work from home / fully remote"
+
+        - id: q_commute_time
+          label: commute_time_minutes
+          type: number
+          text: "How long is your typical one-way commute in minutes?"
+          min: 0
+          max: 300
+          integer_only: true
+          display_if:
+            question: q_commute_mode
+            operator: not_equals
+            value: remote
+
+        - id: q_commute_satisfaction
+          label: commute_satisfaction
+          type: rating
+          text: "How satisfied are you with your commute?"
+          min: 1
+          max: 5
+          min_label: "Very dissatisfied"
+          max_label: "Very satisfied"
+          display_if:
+            question: q_commute_mode
+            operator: not_equals
+            value: remote
+
+        - id: q_employer_benefits
+          label: employer_transport_benefits
+          type: checkbox
+          text: "Does your employer offer any of the following transport benefits?"
+          options:
+            - value: parking
+              text: "Free or subsidised parking"
+            - value: transit_pass
+              text: "Transit pass or subsidy"
+            - value: bike_allowance
+              text: "Cycling allowance or secure bike storage"
+            - value: ev_charging
+              text: "EV charging at workplace"
+            - value: none
+              text: "None of the above"
+
+    - id: page_car_details
+      title: "About Your Car Use"
+      description: "This page only appears if you selected 'Personal car' as a transport mode."
+      display_if:
+        question: q_transport_modes
+        operator: includes
+        value: car
+      questions:
+
+        - id: q_car_trips_per_week
+          label: car_trips_per_week
+          type: number
+          text: "Roughly how many car trips do you make per week?"
+          min: 0
+          max: 200
+          integer_only: true
+
+        - id: q_car_alternatives
+          label: car_could_replace
+          type: radio
+          text: "Do you think you could replace some of your car trips with other modes of transport?"
+          options:
+            - value: yes_many
+              text: "Yes — many of my trips could be replaced"
+            - value: yes_some
+              text: "Yes — some of my trips could be replaced"
+            - value: no
+              text: "No — I need my car for most trips"
+            - value: unsure
+              text: "Unsure"
+
+        - id: q_car_replace_barriers
+          label: car_replace_barriers
+          type: checkbox
+          text: "What would need to change for you to drive less? Select all that apply."
+          display_if:
+            operator: or
+            conditions:
+              - question: q_car_alternatives
+                operator: equals
+                value: yes_many
+              - question: q_car_alternatives
+                operator: equals
+                value: yes_some
+          options:
+            - value: better_transit
+              text: "Better public transit"
+            - value: safer_cycling
+              text: "Safer cycling infrastructure"
+            - value: closer_amenities
+              text: "Amenities closer to home"
+            - value: remote_work
+              text: "More remote work options"
+            - value: cost
+              text: "Higher cost of driving"
+            - value: other
+              text: "Other"
+
+    - id: page_attitudes
+      title: "Your Attitudes"
+      description: "Please indicate how much you agree with each of the following statements."
+      questions:
+
+        - id: q_attitude_grid
+          type: radio_grid
+          text: "How much do you agree or disagree with the following statements?"
+          required: true
+          columns:
+            - value: strongly_disagree
+              text: "Strongly Disagree"
+            - value: disagree
+              text: "Disagree"
+            - value: neutral
+              text: "Neutral"
+            - value: agree
+              text: "Agree"
+            - value: strongly_agree
+              text: "Strongly Agree"
+          rows:
+            - id: q_attitude_transit_reliable
+              label: attitude_transit_reliable
+              text: "Public transit is reliable where I live"
+            - id: q_attitude_cycling_safe
+              label: attitude_cycling_safe
+              text: "Cycling is safe where I live"
+            - id: q_attitude_too_car_dependent
+              label: attitude_too_car_dependent
+              text: "My area is too dependent on cars"
+            - id: q_attitude_remote_reduced_commute
+              label: attitude_remote_reduced_commute
+              text: "Remote work has reduced my need to commute"
+              display_if:
+                question: q_employment
+                operator: equals
+                value: employed
+
+        - id: q_importance_grid
+          type: rating_grid
+          text: "How important are the following factors when choosing how to get around?"
+          min: 1
+          max: 5
+          min_label: "Not at all important"
+          max_label: "Extremely important"
+          rows:
+            - id: q_importance_cost
+              label: importance_cost
+              text: "Cost"
+            - id: q_importance_speed
+              label: importance_speed
+              text: "Speed"
+            - id: q_importance_comfort
+              label: importance_comfort
+              text: "Comfort"
+            - id: q_importance_environment
+              label: importance_environment
+              text: "Environmental impact"
+            - id: q_importance_reliability
+              label: importance_reliability
+              text: "Reliability"
+
+    - id: page_barriers
+      title: "Barriers to Alternative Transport"
+      description: "This section asks about barriers to using non-car transport options."
+      display_if:
+        operator: or
+        conditions:
+          - question: q_transport_modes
+            operator: not_includes
+            value: bus
+          - question: q_transport_modes
+            operator: not_includes
+            value: bike
+      questions:
+
+        - id: q_barriers_grid
+          type: checkbox_grid
+          text: "Which of the following are barriers to you using each mode of transport more often?"
+          columns:
+            - value: too_expensive
+              text: "Too expensive"
+            - value: not_available
+              text: "Not available in my area"
+            - value: inconvenient
+              text: "Inconvenient routes or timing"
+            - value: safety
+              text: "Safety concerns"
+            - value: weather
+              text: "Weather dependent"
+            - value: carrying_things
+              text: "Hard to carry things"
+          rows:
+            - id: q_barriers_transit
+              label_prefix: barrier_transit
+              text: "Public transit (bus, subway, train)"
+            - id: q_barriers_bike
+              label_prefix: barrier_bike
+              text: "Cycling"
+            - id: q_barriers_walk
+              label_prefix: barrier_walk
+              text: "Walking"
+
+
+    - id: page_student
+      title: "Student Travel"
+      description: "This page only appears if you are a student."
+      display_if:
+        question: q_employment
+        operator: equals
+        value: student
+      questions:
+
+        - id: q_student_institution_distance
+          label: student_institution_distance_km
+          type: number
+          text: "Roughly how far is your school or university from where you live, in kilometres?"
+          min: 0
+          max: 500
+
+        - id: q_student_primary_mode
+          label: student_primary_mode
+          type: radio
+          text: "How do you primarily get to school or university?"
+          required: true
+          options:
+            - value: walk
+              text: "Walking"
+            - value: bike
+              text: "Bicycle"
+            - value: transit
+              text: "Public transit"
+            - value: car_own
+              text: "My own car"
+            - value: car_parent
+              text: "Driven by a parent or family member"
+            - value: online
+              text: "I study fully online"
+
+        - id: q_student_transport_cost
+          label: student_transport_hardship
+          type: radio
+          text: "Does the cost of getting to school create financial hardship for you?"
+          display_if:
+            question: q_student_primary_mode
+            operator: not_equals
+            value: online
+          options:
+            - value: yes
+              text: "Yes, it is a significant burden"
+            - value: somewhat
+              text: "Somewhat"
+            - value: no
+              text: "No"
+
+    - id: page_comments
+      title: "Final Comments"
+      questions:
+
+        - id: q_biggest_issue
+          label: biggest_transport_issue
+          type: text
+          text: "In one sentence, what is the single biggest transportation issue in your area?"
+
+        - id: q_additional_comments
+          label: additional_comments
+          type: textarea
+          text: "Any other comments or thoughts about transportation in your area?"

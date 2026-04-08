@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: survey
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --workers 2 --bind 0.0.0.0:$PORT --timeout 60
+    disk:
+      name: survey-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: DB_PATH
+        value: /data/responses.db
+      - key: SURVEY_PATH
+        value: /opt/render/project/src/survey.yaml
+      - key: EXPORT_KEY
+        generateValue: true

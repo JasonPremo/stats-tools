@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Survey</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+  <!-- Loading state -->
+  <div id="screen-loading" class="screen active">
+    <div class="loading-inner">
+      <div class="loading-spinner"></div>
+      <p>Loading survey…</p>
+    </div>
+  </div>
+
+  <!-- Error state -->
+  <div id="screen-error" class="screen">
+    <div class="centered-card">
+      <h2>Something went wrong</h2>
+      <p id="error-message">An unexpected error occurred.</p>
+      <button class="btn-primary" onclick="location.reload()">Try again</button>
+    </div>
+  </div>
+
+  <!-- Welcome / intro screen -->
+  <div id="screen-welcome" class="screen">
+    <div class="centered-card">
+      <div class="survey-header">
+        <div class="header-rule"></div>
+        <h1 id="welcome-title"></h1>
+        <p id="welcome-description"></p>
+        <div class="header-rule"></div>
+      </div>
+      <button id="btn-begin" class="btn-primary">Begin survey</button>
+    </div>
+  </div>
+
+  <!-- Survey pages -->
+  <div id="screen-survey" class="screen">
+    <div class="survey-layout">
+
+      <!-- Sidebar / progress -->
+      <aside class="survey-sidebar">
+        <div class="sidebar-inner">
+          <div class="sidebar-title" id="sidebar-survey-title"></div>
+          <nav id="progress-nav" class="progress-nav" aria-label="Survey progress"></nav>
+          <div class="sidebar-foot">
+            <div class="progress-bar-wrap">
+              <div id="progress-bar" class="progress-bar"></div>
+            </div>
+            <span id="progress-label" class="progress-label"></span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main content area -->
+      <main class="survey-main">
+        <div id="page-container" class="page-container">
+          <!-- Pages are rendered here by JS -->
+        </div>
+
+        <div class="nav-buttons">
+          <button id="btn-back" class="btn-secondary" style="visibility:hidden">← Back</button>
+          <button id="btn-next" class="btn-primary">Continue →</button>
+        </div>
+        <div id="save-resume" class="save-resume" style="display:none">
+          <button id="btn-save-resume" class="save-resume-link">Save progress &amp; continue later</button>
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Completion screen -->
+  <div id="screen-complete" class="screen">
+    <div class="centered-card">
+      <div class="complete-icon">✓</div>
+      <h2>Thank you</h2>
+      <p>Your responses have been recorded.</p>
+    </div>
+  </div>
+
+  <script src="/static/survey.js"></script>
+</body>
+</html>

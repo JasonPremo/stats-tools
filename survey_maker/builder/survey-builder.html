@@ -1,0 +1,3596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Survey Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+/* =========================================================
+   Survey Builder — Utilitarian Precision / Dark Theme
+   IBM Plex Sans + IBM Plex Mono
+   ========================================================= */
+
+:root {
+  --bg:           #161616;
+  --bg-2:         #1e1e1e;
+  --bg-3:         #262626;
+  --bg-4:         #303030;
+  --bg-hover:     #353535;
+  --border:       #393939;
+  --border-light: #4a4a4a;
+  --text:         #f4f4f4;
+  --text-2:       #c6c6c6;
+  --text-3:       #8d8d8d;
+  --text-4:       #525252;
+  --accent:       #0f62fe;
+  --accent-hover: #0353e9;
+  --accent-soft:  #1e3a5f;
+  --green:        #24a148;
+  --green-soft:   #1a3a28;
+  --red:          #da1e28;
+  --red-soft:     #3a1a1c;
+  --yellow:       #f1c21b;
+  --mono:         'IBM Plex Mono', monospace;
+  --sans:         'IBM Plex Sans', sans-serif;
+  --radius:       2px;
+  --radius-md:    4px;
+  --transition:   150ms ease;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ---- Scrollbars ---- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-2); }
+::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+
+/* ---- Toolbar ---- */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 48px;
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  padding: 0 1rem;
+}
+.toolbar-brand {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding-right: 1.5rem;
+  border-right: 1px solid var(--border);
+  margin-right: 1rem;
+  white-space: nowrap;
+}
+.toolbar-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+}
+.toolbar-title-label {
+  font-size: 0.75rem;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+.toolbar-title-input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid transparent;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 2px 4px;
+  min-width: 0;
+  flex: 1;
+  max-width: 320px;
+  transition: border-color var(--transition);
+}
+.toolbar-title-input:focus {
+  outline: none;
+  border-bottom-color: var(--accent);
+}
+.toolbar-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+/* ---- Buttons ---- */
+.btn {
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.4rem 0.875rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition), border-color var(--transition);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-2);
+  border-color: var(--border-light);
+}
+.btn-ghost:hover { background: var(--bg-4); color: var(--text); }
+
+.btn-danger {
+  background: transparent;
+  color: var(--red);
+  border-color: var(--red);
+}
+.btn-danger:hover { background: var(--red-soft); }
+
+.btn-icon {
+  padding: 0.3rem 0.4rem;
+  border-color: transparent;
+  background: transparent;
+  color: var(--text-3);
+  font-size: 0.9rem;
+  line-height: 1;
+}
+.btn-icon:hover { background: var(--bg-4); color: var(--text); }
+.btn-sm { padding: 0.25rem 0.6rem; font-size: 0.75rem; }
+
+/* ---- Main layout ---- */
+.app-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ---- Sidebar ---- */
+.sidebar {
+  width: 340px;
+  flex-shrink: 0;
+  background: var(--bg-2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0.875rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-header-title {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.sidebar-tree {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem 0;
+}
+
+/* ---- Tree items ---- */
+
+/* Groups */
+.tree-group {
+  border-bottom: 1px solid var(--border);
+}
+.tree-group-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.875rem 0.5rem 0.5rem;
+  cursor: pointer;
+  transition: background var(--transition);
+  user-select: none;
+  background: var(--bg-2);
+}
+.tree-group-header:hover { background: var(--bg-3); }
+.tree-group-header.active { background: var(--accent-soft); }
+.tree-group-header.has-condition::after {
+  content: "if";
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  color: var(--yellow);
+  margin-left: auto;
+  opacity: 0.8;
+}
+.tree-group-chevron {
+  font-size: 0.6rem;
+  color: var(--text-4);
+  transition: transform var(--transition);
+  flex-shrink: 0;
+}
+.tree-group.open .tree-group-chevron { transform: rotate(90deg); }
+.tree-group-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-2);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.tree-group-header.active .tree-group-name { color: var(--text); }
+.tree-group-controls {
+  display: none;
+  gap: 0.1rem;
+  margin-left: auto;
+}
+.tree-group-header:hover .tree-group-controls { display: flex; }
+.tree-group-header.has-condition:hover .tree-group-controls { margin-left: 0.5rem; }
+.tree-group-pages {
+  display: none;
+}
+.tree-group.open .tree-group-pages { display: block; }
+
+/* Pages (nested under groups) */
+.tree-page {
+  border-bottom: 1px solid var(--border);
+}
+.tree-page-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.875rem 0.5rem 1.25rem;
+  cursor: pointer;
+  transition: background var(--transition);
+  user-select: none;
+}
+.tree-page-header:hover { background: var(--bg-3); }
+.tree-page-header.active { background: var(--accent-soft); }
+.tree-page-header.has-condition::after {
+  content: "if";
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  color: var(--yellow);
+  margin-left: auto;
+  opacity: 0.8;
+}
+.tree-page-chevron {
+  font-size: 0.6rem;
+  color: var(--text-4);
+  transition: transform var(--transition);
+  flex-shrink: 0;
+}
+.tree-page.open .tree-page-chevron { transform: rotate(90deg); }
+.tree-page-name {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-2);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tree-page-header.active .tree-page-name { color: var(--text); }
+.tree-page-type-badge {
+  font-size: 0.7rem;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+.tree-page-controls {
+  display: none;
+  gap: 0.1rem;
+  margin-left: auto;
+}
+.tree-page-header:hover .tree-page-controls { display: flex; }
+.tree-page-header.has-condition:hover .tree-page-controls { margin-left: 0.5rem; }
+
+.tree-questions {
+  display: none;
+  padding-bottom: 0.25rem;
+}
+.tree-page.open .tree-questions { display: block; }
+
+.tree-question {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.875rem 0.35rem 2rem;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.tree-question:hover { background: var(--bg-3); }
+.tree-question.active { background: var(--accent-soft); }
+.tree-question-type {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  color: var(--text-4);
+  flex-shrink: 0;
+  width: 28px;
+}
+.tree-question.active .tree-question-type { color: var(--text-3); }
+.tree-question-name {
+  font-size: 0.78rem;
+  color: var(--text-3);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tree-question.active .tree-question-name { color: var(--text-2); }
+.tree-question-if {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  color: var(--yellow);
+  opacity: 0.7;
+}
+.tree-question.disabled .tree-question-name {
+  color: var(--text-4);
+  text-decoration: line-through;
+  font-style: italic;
+}
+.tree-question.disabled .tree-question-type { color: var(--text-4); opacity: 0.5; }
+.tree-q-controls {
+  display: none;
+  gap: 0.1rem;
+}
+.tree-question:hover .tree-q-controls { display: flex; }
+
+.tree-add-question {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.875rem 0.3rem 2rem;
+  cursor: pointer;
+  color: var(--text-4);
+  font-size: 0.75rem;
+  transition: color var(--transition);
+}
+.tree-add-question:hover { color: var(--accent); }
+
+/* ---- Main editor panel ---- */
+.editor {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2rem 2.5rem;
+  max-width: 1000px;
+}
+
+.editor-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-4);
+  gap: 0.75rem;
+  text-align: center;
+}
+.editor-empty-icon { font-size: 2.5rem; opacity: 0.3; }
+.editor-empty p { font-size: 0.85rem; }
+
+/* ---- Section headers ---- */
+.section-title {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-4);
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ---- Form fields ---- */
+.field-group {
+  margin-bottom: 1.25rem;
+}
+.field-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+.field-row .field-group { margin-bottom: 0; flex: 1; }
+
+label.field-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-3);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 0.35rem;
+}
+.field-hint {
+  font-size: 0.72rem;
+  color: var(--text-4);
+  margin-top: 0.3rem;
+}
+
+input[type="text"].field-input,
+input[type="number"].field-input,
+textarea.field-input,
+select.field-select {
+  width: 100%;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  padding: 0.5rem 0.625rem;
+  border-radius: var(--radius);
+  transition: border-color var(--transition);
+  appearance: none;
+}
+input[type="text"].field-input:focus,
+input[type="number"].field-input:focus,
+textarea.field-input:focus,
+select.field-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+textarea.field-input { resize: vertical; min-height: 72px; }
+input[type="number"].field-input { max-width: 120px; }
+
+select.field-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238d8d8d'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  padding-right: 2rem;
+  cursor: pointer;
+}
+
+.field-input.mono { font-family: var(--mono); font-size: 0.8rem; }
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+.checkbox-row input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+.checkbox-row span {
+  font-size: 0.82rem;
+  color: var(--text-2);
+}
+
+/* ---- Options list ---- */
+.options-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.375rem 0.5rem;
+}
+.option-row input[type="text"] {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  flex: 1;
+  min-width: 0;
+}
+.option-row input[type="text"]:focus { outline: none; }
+.option-row input[type="text"].mono-input {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--text-3);
+  max-width: 140px;
+}
+.option-row-sep {
+  color: var(--border-light);
+  font-size: 0.7rem;
+}
+.option-has-condition {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  color: var(--yellow);
+  cursor: pointer;
+  opacity: 0.7;
+  padding: 2px 4px;
+  border-radius: var(--radius);
+  transition: opacity var(--transition), background var(--transition);
+}
+.option-has-condition:hover { opacity: 1; background: var(--bg-4); }
+
+/* ---- Grid rows/columns editor ---- */
+.grid-editor {
+  display: flex;
+  gap: 1.5rem;
+}
+.grid-editor-col {
+  flex: 1;
+}
+.grid-row-entry {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.35rem 0.5rem;
+  margin-bottom: 0.4rem;
+}
+.grid-row-entry input[type="text"] {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  flex: 1;
+  min-width: 0;
+}
+.grid-row-entry input[type="text"]:focus { outline: none; }
+.grid-row-entry input.mono-input {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--text-3);
+  max-width: 130px;
+}
+
+/* ---- Condition builder ---- */
+.condition-wrap {
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.875rem;
+  margin-top: 0.5rem;
+}
+.condition-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.condition-toggle label {
+  font-size: 0.78rem;
+  color: var(--text-2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.condition-toggle input[type="radio"] { accent-color: var(--accent); cursor: pointer; }
+
+.condition-builder { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.condition-group {
+  border-left: 2px solid var(--border-light);
+  padding-left: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.condition-group-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+.condition-group-op {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  border: 1px solid var(--border-light);
+  background: var(--bg-4);
+  color: var(--text-3);
+  transition: all var(--transition);
+}
+.condition-group-op.active-and { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.condition-group-op.active-or  { background: var(--green-soft);  border-color: var(--green);  color: var(--green); }
+
+.condition-leaf {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+.condition-leaf select,
+.condition-leaf input[type="text"],
+.condition-leaf input[type="number"] {
+  background: var(--bg-4);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: var(--radius);
+  transition: border-color var(--transition);
+}
+.condition-leaf select:focus,
+.condition-leaf input[type="text"]:focus { outline: none; border-color: var(--accent); }
+.condition-leaf select.q-select { max-width: 280px; }
+.condition-leaf select.op-select { max-width: 130px; }
+.condition-leaf input.val-input  { max-width: 140px; }
+.condition-leaf select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%238d8d8d'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.4rem center;
+  padding-right: 1.5rem;
+  appearance: none;
+  cursor: pointer;
+}
+
+.condition-actions {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+  flex-wrap: wrap;
+}
+
+/* Condition toolbar (copy/paste) */
+.cond-toolbar {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Node action buttons (inline row) */
+.cond-node-actions {
+  display: inline-flex;
+  gap: 0.15rem;
+  margin-left: 0.25rem;
+  flex-shrink: 0;
+}
+.cond-node-actions .btn-icon {
+  font-size: 0.72rem;
+  padding: 0.15rem 0.3rem;
+  min-width: 0;
+  opacity: 0.5;
+  transition: opacity var(--transition);
+}
+.cond-node-actions .btn-icon:hover { opacity: 1; }
+
+/* NOT wrapper */
+.condition-not {
+  border-left: 2px solid var(--red);
+  padding-left: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.condition-not-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.15rem;
+}
+.condition-not-label {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--red);
+  background: rgba(231,76,60,0.08);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius);
+  border: 1px solid rgba(231,76,60,0.25);
+}
+.condition-not-body {
+  padding-left: 0;
+}
+
+/* Child row with selection checkbox */
+.condition-child-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.3rem;
+}
+.cond-select-cb {
+  margin-top: 0.45rem;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* Group footer */
+.condition-group-footer {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* ---- Divider ---- */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 1.5rem 0;
+}
+
+/* ---- Type badge ---- */
+.type-badge {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--radius);
+  background: var(--bg-4);
+  color: var(--text-3);
+  border: 1px solid var(--border);
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+/* ---- Toast ---- */
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  background: var(--green);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-md);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+  z-index: 9999;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.error { background: var(--red); }
+
+/* ---- Modal ---- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--bg-2);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  width: 400px;
+  max-width: 90vw;
+  transform: translateY(-12px);
+  transition: transform 0.15s;
+}
+.modal-overlay.open .modal { transform: translateY(0); }
+.modal h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+/* ---- Page editor specifics ---- */
+.editor-page-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+.editor-page-heading h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ---- Question type picker ---- */
+.type-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+.type-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.625rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background: var(--bg-3);
+  transition: border-color var(--transition), background var(--transition);
+  text-align: center;
+}
+.type-option:hover { border-color: var(--accent); background: var(--bg-4); }
+.type-option.selected { border-color: var(--accent); background: var(--accent-soft); }
+.type-option-icon { font-size: 1.1rem; }
+.type-option-name {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-2);
+  font-family: var(--mono);
+}
+
+/* ---- Survey description field ---- */
+.survey-meta {
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+.survey-meta-title {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-4);
+  margin-bottom: 1rem;
+}
+</style>
+</head>
+<body>
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <div class="toolbar-brand">Survey Builder</div>
+  <div class="toolbar-title-wrap">
+    <span class="toolbar-title-label">Title:</span>
+    <input type="text" class="toolbar-title-input" id="survey-title-input" placeholder="Untitled Survey" />
+  </div>
+  <div class="toolbar-actions">
+    <button class="btn btn-ghost" id="btn-import" title="Import YAML">⬆ Import YAML</button>
+    <button class="btn btn-ghost" id="btn-description" title="Edit description">Description</button>
+    <button class="btn btn-primary" id="btn-export" title="Export YAML">⬇ Export YAML</button>
+  </div>
+</div>
+
+<!-- Hidden file input for import -->
+<input type="file" id="file-import" accept=".yaml,.yml" style="display:none" />
+
+<!-- App body -->
+<div class="app-body">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-header-title">Groups &amp; Pages</span>
+      <button class="btn btn-ghost btn-sm" id="btn-add-group">+ Group</button>
+      <button class="btn btn-ghost btn-sm" id="btn-add-page">+ Page</button>
+    </div>
+    <div class="sidebar-tree" id="sidebar-tree"></div>
+  </aside>
+
+  <!-- Editor -->
+  <div class="editor" id="editor">
+    <div class="editor-empty">
+      <div class="editor-empty-icon">⬡</div>
+      <p>Select a page or question to edit<br/>or add a new page to get started.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- Type picker modal -->
+<div class="modal-overlay" id="modal-type">
+  <div class="modal">
+    <h3>Choose question type</h3>
+    <div class="type-grid" id="type-grid"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="modal-type-cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Description modal -->
+<div class="modal-overlay" id="modal-description">
+  <div class="modal">
+    <h3>Survey description</h3>
+    <div class="field-group">
+      <label class="field-label">Description <span style="font-weight:300;text-transform:none;letter-spacing:0">(shown on welcome screen)</span></label>
+      <textarea class="field-input" id="survey-description-input" rows="4" placeholder="Optional intro text…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="modal-desc-save">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===========================================================================
+// Survey Builder — State & Core Logic
+// ===========================================================================
+
+"use strict";
+
+// ---------------------------------------------------------------------------
+// State
+// ---------------------------------------------------------------------------
+
+let state = {
+  title: "Untitled Survey",
+  description: "",
+  page_groups: [],   // [{id, title, display_if, _open, pages:[...]}]
+};
+
+let selected = { type: null, groupId: null, pageId: null, questionId: null };
+// type: 'group' | 'page' | 'question' | null
+
+let _idCounter = 1;
+function uid(prefix) { return `${prefix}_${Date.now()}_${_idCounter++}`; }
+
+// ---------------------------------------------------------------------------
+// Question type definitions
+// ---------------------------------------------------------------------------
+
+const QUESTION_TYPES = [
+  { type: "radio",        label: "radio",        icon: "◉", desc: "Single choice" },
+  { type: "checkbox",     label: "checkbox",     icon: "☑", desc: "Multi select" },
+  { type: "dropdown",     label: "dropdown",     icon: "▾", desc: "Select box" },
+  { type: "text",         label: "text",         icon: "▬", desc: "Short text" },
+  { type: "textarea",     label: "textarea",     icon: "≡", desc: "Long text" },
+  { type: "number",       label: "number",       icon: "#", desc: "Numeric" },
+  { type: "rating",       label: "rating",       icon: "★", desc: "Scale" },
+  { type: "radio_grid",   label: "radio_grid",   icon: "⊞", desc: "Radio matrix" },
+  { type: "checkbox_grid",label: "checkbox_grid",icon: "⊟", desc: "Checkbox matrix" },
+  { type: "rating_grid",  label: "rating_grid",  icon: "⊠", desc: "Rating matrix" },
+  { type: "number_grid",  label: "number_grid",  icon: "#⊞", desc: "Number matrix" },
+];
+
+const OPTION_TYPES    = new Set(["radio","checkbox","dropdown"]);
+const GRID_TYPES      = new Set(["radio_grid","checkbox_grid","rating_grid","number_grid"]);
+const NUMBER_TYPES    = new Set(["number","rating","rating_grid"]);
+const HAS_ROWS        = new Set(["radio_grid","checkbox_grid","rating_grid","number_grid"]);
+const HAS_COLS        = new Set(["radio_grid","checkbox_grid","number_grid"]);
+const LABEL_TYPES     = new Set(["radio","checkbox","dropdown","text","textarea","number","rating"]);
+
+// ---------------------------------------------------------------------------
+// Default question factory
+// ---------------------------------------------------------------------------
+
+function newQuestion(type) {
+  const q = { id: uid("q"), type, text: "", label: "", required: false, disabled: false, layout: null, notes: null, note_title: "Note", note_position: "side", warn_if_empty: null, display_if: null, defines_variable: null };
+  if (OPTION_TYPES.has(type)) {
+    if (type === "radio") {
+      q.options = [newOption("0"), newOption("1"), newOption("2")];
+    } else {
+      q.options = [newOption(), newOption(), newOption()];
+    }
+  }
+  if (type === "number") {
+    q.min = ""; q.max = ""; q.integer_only = false; q.default_value = "";
+  }
+  if (type === "rating") {
+    q.min = 1; q.max = 5; q.min_label = ""; q.max_label = "";
+  }
+  if (HAS_ROWS.has(type)) {
+    q.rows = [newRow(type), newRow(type), newRow(type)];
+  }
+  if (HAS_COLS.has(type)) {
+    q.columns = [newCol(), newCol(), newCol()];
+  }
+  if (type === "rating_grid") {
+    q.min = 1; q.max = 5; q.min_label = ""; q.max_label = "";
+  }
+  if (type === "number_grid") {
+    q.min = ""; q.max = ""; q.integer_only = false; q.default_value = "";
+  }
+  return q;
+}
+
+function newOption(value)  { return { id: uid("opt"), value: value || "", text: "", display_if: null }; }
+function newRow(type) {
+  return type === "checkbox_grid"
+    ? { id: uid("row"), text: "", label_prefix: "", display_if: null }
+    : { id: uid("row"), text: "", label: "", display_if: null };
+}
+function newCol()     { return { id: uid("col"), value: "", text: "" }; }
+function newPage()    { return { id: uid("page"), title: "New Page", description: "", display_if: null, builder_notes: "", page_type: "standard", breakout_button_label: "End survey", continue_button_label: "Continue", acknowledge_text: "", questions: [] }; }
+function newGroup()   { return { id: uid("group"), title: "New Group", display_if: null, _open: true, pages: [] }; }
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/** Flat list of all pages across all groups */
+function allPages() {
+  return state.page_groups.flatMap(g => g.pages);
+}
+
+/** Find which group a page belongs to */
+function findGroupForPage(pageId) {
+  return state.page_groups.find(g => g.pages.some(p => p.id === pageId));
+}
+
+function findGroup(groupId) { return state.page_groups.find(g => g.id === groupId); }
+function findPage(pageId) { return allPages().find(p => p.id === pageId); }
+function findQuestion(pageId, qId) {
+  const page = findPage(pageId);
+  return page ? page.questions.find(q => q.id === qId) : null;
+}
+
+// All questions that appear strictly before a given element (for display_if)
+// Grid rows are included as separate entries so they can be condition targets.
+function questionsBefore(pageId, questionId) {
+  const result = [];
+  for (const page of allPages()) {
+    if (page.id === pageId && !questionId) break;
+    for (const q of page.questions) {
+      if (q.id === questionId) return result;
+      result.push({ id: q.id, label: q.label || q.id, type: q.type, text: q.text, options: q.options || [], rows: q.rows || [], columns: q.columns || [], min: q.min, max: q.max });
+      // Add grid rows as individually referenceable targets
+      if (HAS_ROWS.has(q.type) && q.rows) {
+        q.rows.forEach(r => {
+          result.push({
+            id: r.id,
+            label: r.label || r.label_prefix || r.id,
+            type: q.type + "_row",
+            text: r.text,
+            options: [],
+            rows: [],
+            columns: q.columns || [],
+            min: q.min,
+            max: q.max,
+            _parentId: q.id,
+            _parentText: q.text,
+          });
+          // For number_grid: also emit individual cells (row×column)
+          if (q.type === "number_grid" && q.columns) {
+            q.columns.forEach(c => {
+              result.push({
+                id: `${r.id}__${c.value}`,
+                label: `${r.label || r.id}__${c.value}`,
+                type: "number_grid_cell",
+                text: `${r.text} × ${c.text}`,
+                options: [],
+                rows: [],
+                columns: [],
+                min: q.min,
+                max: q.max,
+                _parentId: q.id,
+                _parentText: q.text,
+                _rowText: r.text,
+                _colText: c.text,
+              });
+            });
+          }
+        });
+      }
+    }
+    if (page.id === pageId) break;
+  }
+  return result;
+}
+
+function allQuestionsBefore(pageId) {
+  // For page-level display_if: all questions on all prior pages
+  const result = [];
+  for (const page of allPages()) {
+    if (page.id === pageId) break;
+    for (const q of page.questions) {
+      result.push({ id: q.id, label: q.label || q.id, type: q.type, text: q.text, options: q.options || [], rows: q.rows || [], columns: q.columns || [], min: q.min, max: q.max });
+      if (HAS_ROWS.has(q.type) && q.rows) {
+        q.rows.forEach(r => {
+          result.push({
+            id: r.id,
+            label: r.label || r.label_prefix || r.id,
+            type: q.type + "_row",
+            text: r.text,
+            options: [],
+            rows: [],
+            columns: q.columns || [],
+            min: q.min,
+            max: q.max,
+            _parentId: q.id,
+            _parentText: q.text,
+          });
+          if (q.type === "number_grid" && q.columns) {
+            q.columns.forEach(c => {
+              result.push({
+                id: `${r.id}__${c.value}`,
+                label: `${r.label || r.id}__${c.value}`,
+                type: "number_grid_cell",
+                text: `${r.text} × ${c.text}`,
+                options: [],
+                rows: [],
+                columns: [],
+                min: q.min,
+                max: q.max,
+                _parentId: q.id,
+                _parentText: q.text,
+                _rowText: r.text,
+                _colText: c.text,
+              });
+            });
+          }
+        });
+      }
+    }
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Sidebar rendering
+// ---------------------------------------------------------------------------
+
+function renderSidebar() {
+  const tree = document.getElementById("sidebar-tree");
+  tree.innerHTML = "";
+
+  state.page_groups.forEach((group, gi) => {
+    const groupDiv = document.createElement("div");
+    groupDiv.className = "tree-group";
+    const isGroupSelected = selected.type === "group" && selected.groupId === group.id;
+    const isGroupOpen = group._open !== false;
+
+    if (isGroupOpen) groupDiv.classList.add("open");
+
+    const groupHeader = document.createElement("div");
+    groupHeader.className = "tree-group-header" + (isGroupSelected ? " active" : "") + (group.display_if ? " has-condition" : "");
+    groupHeader.innerHTML = `
+      <span class="tree-group-chevron">▶</span>
+      <span class="tree-group-name">${escHtml(group.title || "Untitled Group")}</span>
+      <span class="tree-group-controls">
+        <button class="btn btn-icon" data-action="group-duplicate" data-group="${group.id}" title="Duplicate group">⧉</button>
+        <button class="btn btn-icon" data-action="group-add-page" data-group="${group.id}" title="Add page">+</button>
+        <button class="btn btn-icon" data-action="group-up" data-group="${group.id}" title="Move up">↑</button>
+        <button class="btn btn-icon" data-action="group-down" data-group="${group.id}" title="Move down">↓</button>
+        <button class="btn btn-icon" data-action="group-delete" data-group="${group.id}" title="Delete group" style="color:var(--red)">✕</button>
+      </span>`;
+
+    groupHeader.addEventListener("click", (e) => {
+      if (e.target.closest("[data-action]")) return;
+      group._open = !isGroupOpen;
+      selectGroup(group.id);
+    });
+
+    const groupBody = document.createElement("div");
+    groupBody.className = "tree-group-pages";
+
+    group.pages.forEach((page, pi) => {
+      const pageDiv = document.createElement("div");
+      pageDiv.className = "tree-page";
+      const isPageSelected = selected.type === "page" && selected.pageId === page.id;
+      const isOpen = page._open !== false;
+
+      if (isOpen) pageDiv.classList.add("open");
+
+      const header = document.createElement("div");
+      header.className = "tree-page-header" + (isPageSelected ? " active" : "") + (page.display_if ? " has-condition" : "");
+
+      const ptBadge = page.page_type && page.page_type !== "standard"
+        ? `<span class="tree-page-type-badge">${page.page_type === "section_title" ? "§" : "⚠"}</span>`
+        : "";
+
+      header.innerHTML = `
+        <span class="tree-page-chevron">▶</span>
+        ${ptBadge}
+        <span class="tree-page-name">${escHtml(page.title || "Untitled Page")}</span>
+        <span class="tree-page-controls">
+          <button class="btn btn-icon" data-action="page-duplicate" data-page="${page.id}" title="Duplicate page">⧉</button>
+          <button class="btn btn-icon" data-action="page-up" data-page="${page.id}" title="Move up">↑</button>
+          <button class="btn btn-icon" data-action="page-down" data-page="${page.id}" title="Move down">↓</button>
+          <button class="btn btn-icon" data-action="page-delete" data-page="${page.id}" title="Delete page" style="color:var(--red)">✕</button>
+        </span>`;
+
+      header.addEventListener("click", (e) => {
+        if (e.target.closest("[data-action]")) return;
+        page._open = !isOpen;
+        selectPage(page.id);
+      });
+
+      const qList = document.createElement("div");
+      qList.className = "tree-questions";
+
+      page.questions.forEach((q, qi) => {
+        const isQSelected = selected.type === "question" && selected.questionId === q.id;
+        const qDiv = document.createElement("div");
+        qDiv.className = "tree-question" + (isQSelected ? " active" : "") + (q.disabled ? " disabled" : "");
+        const typeAbbr = q.type.replace("_grid","_g").replace("checkbox","chk").replace("textarea","txtarea").replace("dropdown","drop").replace("number","num").replace("rating","rate");
+        qDiv.innerHTML = `
+          <span class="tree-question-type">${typeAbbr}</span>
+          <span class="tree-question-name">${escHtml(q.text || q.label || "Untitled")}</span>
+          ${q.display_if ? '<span class="tree-question-if">if</span>' : ''}
+          <span class="tree-q-controls">
+            <button class="btn btn-icon" data-action="q-duplicate" data-page="${page.id}" data-q="${q.id}" title="Duplicate">⧉</button>
+            <button class="btn btn-icon" data-action="q-up" data-page="${page.id}" data-q="${q.id}" title="Move up">↑</button>
+            <button class="btn btn-icon" data-action="q-down" data-page="${page.id}" data-q="${q.id}" title="Move down">↓</button>
+            <button class="btn btn-icon" data-action="q-delete" data-page="${page.id}" data-q="${q.id}" title="Delete" style="color:var(--red)">✕</button>
+          </span>`;
+        qDiv.addEventListener("click", (e) => {
+          if (e.target.closest("[data-action]")) return;
+          selectQuestion(page.id, q.id);
+        });
+        qList.appendChild(qDiv);
+      });
+
+      // Add question button (not for section_title or breakout pages)
+      const pt = page.page_type || "standard";
+      if (pt === "standard") {
+        const addQ = document.createElement("div");
+        addQ.className = "tree-add-question";
+        addQ.textContent = "+ Add question";
+        addQ.addEventListener("click", () => openTypePicker(page.id));
+        qList.appendChild(addQ);
+      }
+
+      pageDiv.appendChild(header);
+      pageDiv.appendChild(qList);
+      groupBody.appendChild(pageDiv);
+    });
+
+    groupDiv.appendChild(groupHeader);
+    groupDiv.appendChild(groupBody);
+    tree.appendChild(groupDiv);
+  });
+
+  // Delegated action handler
+  tree.onclick = (e) => {
+    const btn = e.target.closest("[data-action]");
+    if (!btn) return;
+    const action  = btn.dataset.action;
+    const groupId = btn.dataset.group;
+    const pageId  = btn.dataset.page;
+    const qId     = btn.dataset.q;
+    e.stopPropagation();
+
+    if (action === "group-duplicate") duplicateGroup(groupId);
+    if (action === "group-add-page") addPageToGroup(groupId);
+    if (action === "group-up")       moveGroup(groupId, -1);
+    if (action === "group-down")     moveGroup(groupId, 1);
+    if (action === "group-delete")   deleteGroup(groupId);
+    if (action === "page-up")        movePage(pageId, -1);
+    if (action === "page-down")      movePage(pageId,  1);
+    if (action === "page-duplicate") duplicatePage(pageId);
+    if (action === "page-delete")    deletePage(pageId);
+    if (action === "q-up")        moveQuestion(pageId, qId, -1);
+    if (action === "q-down")      moveQuestion(pageId, qId,  1);
+    if (action === "q-duplicate") duplicateQuestion(pageId, qId);
+    if (action === "q-delete")    deleteQuestion(pageId, qId);
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Selection
+// ---------------------------------------------------------------------------
+
+function selectGroup(groupId) {
+  selected = { type: "group", groupId, pageId: null, questionId: null };
+  renderSidebar();
+  renderEditor();
+}
+
+function selectPage(pageId) {
+  selected = { type: "page", groupId: null, pageId, questionId: null };
+  renderSidebar();
+  renderEditor();
+}
+
+function selectQuestion(pageId, questionId) {
+  selected = { type: "question", groupId: null, pageId, questionId };
+  // Make sure the page is open in the tree
+  const page = findPage(pageId);
+  if (page) page._open = true;
+  const group = findGroupForPage(pageId);
+  if (group) group._open = true;
+  renderSidebar();
+  renderEditor();
+}
+
+// ---------------------------------------------------------------------------
+// Group / Page / question mutations
+// ---------------------------------------------------------------------------
+
+function addGroup() {
+  const group = newGroup();
+  state.page_groups.push(group);
+  selectGroup(group.id);
+}
+
+function addPageToGroup(groupId) {
+  const group = findGroup(groupId);
+  if (!group) return;
+  const page = newPage();
+  page._open = true;
+  group.pages.push(page);
+  group._open = true;
+  selectPage(page.id);
+}
+
+function moveGroup(groupId, dir) {
+  const idx = state.page_groups.findIndex(g => g.id === groupId);
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= state.page_groups.length) return;
+  [state.page_groups[idx], state.page_groups[newIdx]] = [state.page_groups[newIdx], state.page_groups[idx]];
+  renderSidebar();
+}
+
+function deleteGroup(groupId) {
+  const group = findGroup(groupId);
+  if (!group) return;
+  const pageCount = group.pages.length;
+  if (pageCount > 0 && !confirm(`Delete this group and its ${pageCount} page(s)?`)) return;
+  state.page_groups = state.page_groups.filter(g => g.id !== groupId);
+  selected = { type: null, groupId: null, pageId: null, questionId: null };
+  renderSidebar();
+  renderEditor();
+}
+
+function duplicateGroup(groupId) {
+  const src = findGroup(groupId);
+  if (!src) return;
+
+  // Deep clone the group
+  const clone = JSON.parse(JSON.stringify(src));
+
+  // Build an ID remap table: old internal IDs → new IDs
+  // This covers question ids and grid row ids (anything that can be
+  // referenced by a display_if condition).
+  const idMap = {};
+
+  clone.id = uid("group");
+  clone.title = src.title + " (copy)";
+  clone._open = true;
+
+  clone.pages.forEach(page => {
+    page.id = uid("page");
+    page._open = true;
+    page.questions.forEach(q => {
+      const oldQId = q.id;
+      q.id = uid("q");
+      idMap[oldQId] = q.id;
+
+      if (q.options) q.options.forEach(o => { o.id = uid("opt"); });
+      if (q.rows) q.rows.forEach(r => {
+        const oldRowId = r.id;
+        r.id = uid("row");
+        idMap[oldRowId] = r.id;
+      });
+      if (q.columns) q.columns.forEach(c => { c.id = uid("col"); });
+    });
+  });
+
+  // Now walk all display_if conditions in the clone and remap internal references.
+  // References to IDs in idMap are internal → update them.
+  // References to IDs NOT in idMap are external → leave untouched.
+  const remapCondition = (cond) => {
+    if (!cond) return;
+    if (cond.operator === "and" || cond.operator === "or") {
+      (cond.conditions || []).forEach(remapCondition);
+      return;
+    }
+    // Leaf condition — remap question ref if internal
+    if (cond.question && cond.question in idMap) {
+      cond.question = idMap[cond.question];
+    }
+  };
+
+  // Remap group-level condition
+  remapCondition(clone.display_if);
+
+  // Remap all page and question/option/row conditions
+  clone.pages.forEach(page => {
+    remapCondition(page.display_if);
+    page.questions.forEach(q => {
+      remapCondition(q.display_if);
+      if (q.options) q.options.forEach(o => remapCondition(o.display_if));
+      if (q.rows) q.rows.forEach(r => remapCondition(r.display_if));
+    });
+  });
+
+  // Also remap defines_variable — leave name as-is (user may want to
+  // rename it) but remap any mapping keys that reference internal IDs
+  // (mapping keys are answer values, not IDs, so nothing to remap there)
+
+  // Insert after the source group
+  const idx = state.page_groups.findIndex(g => g.id === groupId);
+  state.page_groups.splice(idx + 1, 0, clone);
+  selectGroup(clone.id);
+  showToast("Group duplicated — internal conditions updated, external references preserved");
+}
+
+function addPage() {
+  const page = newPage();
+  page._open = true;
+  // Insert after the currently selected page in its group, or append to last group
+  const currentPageId = selected.pageId;
+  const group = currentPageId ? findGroupForPage(currentPageId) : null;
+  if (group) {
+    const idx = group.pages.findIndex(p => p.id === currentPageId);
+    group.pages.splice(idx + 1, 0, page);
+  } else if (state.page_groups.length > 0) {
+    state.page_groups[state.page_groups.length - 1].pages.push(page);
+  } else {
+    const g = newGroup();
+    g.pages.push(page);
+    state.page_groups.push(g);
+  }
+  selectPage(page.id);
+}
+
+function duplicatePage(pageId) {
+  const src = findPage(pageId);
+  const group = findGroupForPage(pageId);
+  if (!src || !group) return;
+  const clone = JSON.parse(JSON.stringify(src));
+  clone.id = uid("page");
+  clone.title = src.title + " (copy)";
+  clone._open = true;
+  clone.questions.forEach(q => {
+    q.id = uid("q");
+    if (q.options) q.options.forEach(o => { o.id = uid("opt"); });
+    if (q.rows)    q.rows.forEach(r => { r.id = uid("row"); });
+    if (q.columns) q.columns.forEach(c => { c.id = uid("col"); });
+  });
+  const idx = group.pages.findIndex(p => p.id === pageId);
+  group.pages.splice(idx + 1, 0, clone);
+  selectPage(clone.id);
+  showToast("Page duplicated");
+}
+
+function deletePage(pageId) {
+  if (!confirm("Delete this page and all its questions?")) return;
+  const group = findGroupForPage(pageId);
+  if (group) group.pages = group.pages.filter(p => p.id !== pageId);
+  selected = { type: null, groupId: null, pageId: null, questionId: null };
+  renderSidebar();
+  renderEditor();
+}
+
+function movePage(pageId, dir) {
+  const group = findGroupForPage(pageId);
+  if (!group) return;
+  const idx = group.pages.findIndex(p => p.id === pageId);
+  const newIdx = idx + dir;
+  if (newIdx >= 0 && newIdx < group.pages.length) {
+    [group.pages[idx], group.pages[newIdx]] = [group.pages[newIdx], group.pages[idx]];
+    renderSidebar();
+    if (selected.pageId === pageId) renderEditor();
+    return;
+  }
+  // Cross group boundary
+  const gi = state.page_groups.findIndex(g => g.id === group.id);
+  if (dir === -1 && (idx === 0) && gi > 0) {
+    const [p] = group.pages.splice(idx, 1);
+    state.page_groups[gi - 1].pages.push(p);
+    state.page_groups[gi - 1]._open = true;
+    renderSidebar();
+  } else if (dir === 1 && (idx === group.pages.length - 1) && gi < state.page_groups.length - 1) {
+    const [p] = group.pages.splice(idx, 1);
+    state.page_groups[gi + 1].pages.unshift(p);
+    state.page_groups[gi + 1]._open = true;
+    renderSidebar();
+  }
+}
+
+function addQuestion(pageId, type) {
+  const page = findPage(pageId);
+  if (!page) return;
+  const q = newQuestion(type);
+  page.questions.push(q);
+  selectQuestion(pageId, q.id);
+}
+
+function deleteQuestion(pageId, qId) {
+  const page = findPage(pageId);
+  if (!page) return;
+  page.questions = page.questions.filter(q => q.id !== qId);
+  if (selected.questionId === qId) {
+    selected = { type: "page", pageId, questionId: null };
+    renderEditor();
+  }
+  renderSidebar();
+}
+
+function duplicateQuestion(pageId, qId) {
+  const page = findPage(pageId);
+  if (!page) return;
+  const idx = page.questions.findIndex(q => q.id === qId);
+  if (idx < 0) return;
+  const clone = JSON.parse(JSON.stringify(page.questions[idx]));
+  clone.id = uid("q");
+  if (clone.options) clone.options.forEach(o => { o.id = uid("opt"); });
+  if (clone.rows)    clone.rows.forEach(r => { r.id = uid("row"); });
+  if (clone.columns) clone.columns.forEach(c => { c.id = uid("col"); });
+  page.questions.splice(idx + 1, 0, clone);
+  selectQuestion(pageId, clone.id);
+  showToast("Question duplicated");
+}
+
+function moveQuestion(pageId, qId, dir) {
+  const page = findPage(pageId);
+  if (!page) return;
+  const idx = page.questions.findIndex(q => q.id === qId);
+  const newIdx = idx + dir;
+
+  // Within the same page
+  if (newIdx >= 0 && newIdx < page.questions.length) {
+    [page.questions[idx], page.questions[newIdx]] = [page.questions[newIdx], page.questions[idx]];
+    renderSidebar();
+    return;
+  }
+
+  // Cross page boundary
+  const flat = allPages();
+  const pageIdx = flat.findIndex(p => p.id === pageId);
+  const [q] = page.questions.splice(idx, 1);
+
+  if (dir === -1 && pageIdx > 0) {
+    const prevPage = flat[pageIdx - 1];
+    prevPage.questions.push(q);
+    prevPage._open = true;
+    selected.pageId = prevPage.id;
+  } else if (dir === 1 && pageIdx < flat.length - 1) {
+    const nextPage = flat[pageIdx + 1];
+    nextPage.questions.unshift(q);
+    nextPage._open = true;
+    selected.pageId = nextPage.id;
+  } else {
+    page.questions.splice(idx, 0, q);
+  }
+
+  renderSidebar();
+}
+
+// ---------------------------------------------------------------------------
+// Type picker modal
+// ---------------------------------------------------------------------------
+
+let _typePickerPageId = null;
+
+function openTypePicker(pageId) {
+  _typePickerPageId = pageId;
+  const grid = document.getElementById("type-grid");
+  grid.innerHTML = "";
+  QUESTION_TYPES.forEach(qt => {
+    const el = document.createElement("div");
+    el.className = "type-option";
+    el.innerHTML = `<span class="type-option-icon">${qt.icon}</span><span class="type-option-name">${qt.label}</span>`;
+    el.addEventListener("click", () => {
+      closeModal("modal-type");
+      addQuestion(_typePickerPageId, qt.type);
+    });
+    grid.appendChild(el);
+  });
+  openModal("modal-type");
+}
+
+// ---------------------------------------------------------------------------
+// Editor rendering
+// ---------------------------------------------------------------------------
+
+function renderEditor() {
+  const editor = document.getElementById("editor");
+
+  if (!selected.type) {
+    editor.innerHTML = `<div class="editor-empty"><div class="editor-empty-icon">⬡</div><p>Select a group, page, or question to edit<br/>or add a new group to get started.</p></div>`;
+    return;
+  }
+
+  if (selected.type === "group") {
+    renderGroupEditor(editor);
+  } else if (selected.type === "page") {
+    renderPageEditor(editor);
+  } else {
+    renderQuestionEditor(editor);
+  }
+}
+
+// ---- Group editor ----
+function renderGroupEditor(container) {
+  const group = findGroup(selected.groupId);
+  if (!group) return;
+
+  container.innerHTML = "";
+
+  const heading = el("div", "editor-page-heading");
+  heading.innerHTML = `<h2>Group</h2><span class="type-badge">${escHtml(group.id)}</span>`;
+  container.appendChild(heading);
+
+  container.appendChild(field("Title", textInput(group.title, v => { group.title = v; renderSidebar(); })));
+
+  container.appendChild(el("div", "divider"));
+
+  // display_if — all questions before this group's first page
+  const firstPage = group.pages[0];
+  const availQ = firstPage ? allQuestionsBefore(firstPage.id) : [];
+  container.appendChild(conditionSection("Show this group conditionally", group, availQ, () => renderSidebar()));
+}
+
+// ---- Page editor ----
+function renderPageEditor(container) {
+  const page = findPage(selected.pageId);
+  if (!page) return;
+
+  container.innerHTML = "";
+
+  const heading = el("div", "editor-page-heading");
+  heading.innerHTML = `<h2>Page</h2><span class="type-badge">${escHtml(page.id)}</span>`;
+  container.appendChild(heading);
+
+  // Page type selector
+  const typeWrap = el("div", "field-group");
+  const typeLbl = el("label", "field-label");
+  typeLbl.textContent = "Page type";
+  typeWrap.appendChild(typeLbl);
+  const typeRow = el("div");
+  typeRow.style.cssText = "display:flex; gap:0.5rem; flex-wrap:wrap;";
+  [
+    ["standard",      "Standard"],
+    ["section_title", "Section title"],
+    ["breakout",      "Breakout"],
+  ].forEach(([val, label]) => {
+    const btn = el("button", "btn btn-ghost btn-sm");
+    btn.textContent = label;
+    if ((page.page_type || "standard") === val) {
+      btn.style.borderColor = "var(--accent)";
+      btn.style.color = "var(--accent)";
+    }
+    btn.addEventListener("click", () => { page.page_type = val; renderSidebar(); renderEditor(); });
+    typeRow.appendChild(btn);
+  });
+  typeWrap.appendChild(typeRow);
+  container.appendChild(typeWrap);
+
+  // Title
+  container.appendChild(field("Title", textInput(page.title, v => { page.title = v; renderSidebar(); })));
+
+  // Description
+  container.appendChild(field("Description", textareaInput(page.description || "", v => { page.description = v; })));
+
+  // Breakout-specific fields
+  if (page.page_type === "breakout") {
+    container.appendChild(el("div", "divider"));
+
+    const breakoutTitle = el("div", "section-title");
+    breakoutTitle.textContent = "Breakout page settings";
+    container.appendChild(breakoutTitle);
+
+    const ackField = field("Acknowledgment text (required)", textareaInput(page.acknowledge_text || "", v => { page.acknowledge_text = v; }, 2));
+    ackField.appendChild(hint("Shown next to the checkbox the respondent must check before continuing."));
+    container.appendChild(ackField);
+
+    container.appendChild(field("End survey button label", textInput(page.breakout_button_label || "End survey", v => { page.breakout_button_label = v; })));
+    container.appendChild(field("Continue button label", textInput(page.continue_button_label || "Continue", v => { page.continue_button_label = v; })));
+  }
+
+  // Builder notes (personal, not shown in survey)
+  container.appendChild(el("div", "divider"));
+  const notesWrap = el("div", "field-group");
+  const notesLbl = document.createElement("label");
+  notesLbl.className = "field-label";
+  notesLbl.textContent = "Builder Notes";
+  const notesHint = el("div", "field-hint");
+  notesHint.textContent = "Private notes — not shown to respondents.";
+  notesHint.style.marginTop = "0";
+  notesHint.style.marginBottom = "0.35rem";
+  const notesTa = textareaInput(page.builder_notes || "", v => { page.builder_notes = v; }, 3);
+  notesTa.placeholder = "Your notes about this page…";
+  notesTa.style.opacity = "0.8";
+  notesWrap.appendChild(notesLbl);
+  notesWrap.appendChild(notesHint);
+  notesWrap.appendChild(notesTa);
+  container.appendChild(notesWrap);
+
+  container.appendChild(el("div", "divider"));
+
+  // display_if
+  const availQ = allQuestionsBefore(page.id);
+  container.appendChild(conditionSection("Show this page conditionally", page, availQ, () => renderSidebar()));
+}
+
+// ---- Question editor ----
+function renderQuestionEditor(container) {
+  const q = findQuestion(selected.pageId, selected.questionId);
+  if (!q) return;
+
+  container.innerHTML = "";
+
+  const heading = el("div", "editor-page-heading");
+  heading.innerHTML = `<h2>Question</h2><span class="type-badge">${q.type}</span><span class="type-badge" style="color:var(--text-3)">${escHtml(q.id)}</span>`;
+
+  // Convert button — radio/dropdown/horizontal radio/two-col radio are interconvertible;
+  // checkbox/two-col checkbox are interconvertible.
+  // Radio family: radio (any layout) + dropdown
+  // Checkbox family: checkbox (any layout)
+  const isRadioFamily    = ["radio","dropdown"].includes(q.type);
+  const isCheckboxFamily = q.type === "checkbox";
+
+  if (isRadioFamily || isCheckboxFamily) {
+    const convertWrap = el("div", "field-group");
+    convertWrap.style.cssText = "margin-left:auto; display:flex; align-items:center; gap:0.5rem; flex-shrink:0; flex-wrap:wrap;";
+
+    const convertLabel = el("span");
+    convertLabel.style.cssText = "font-size:0.72rem; color:var(--text-3); white-space:nowrap;";
+    convertLabel.textContent = "Convert to:";
+    convertWrap.appendChild(convertLabel);
+
+    // Each target: [type, layout, button label]
+    const targets = isRadioFamily ? [
+      ["radio",    null,         "radio"],
+      ["radio",    "horizontal", "horizontal radio"],
+      ["radio",    "two_col",    "two-col radio"],
+      ["dropdown", null,         "dropdown"],
+    ] : [
+      ["checkbox", null,         "checkbox"],
+      ["checkbox", "horizontal", "horizontal checkbox"],
+      ["checkbox", "two_col",    "two-col checkbox"],
+    ];
+
+    targets.forEach(([toType, toLayout, label]) => {
+      // Skip current state
+      if (toType === q.type && (toLayout || null) === (q.layout || null)) return;
+      const btn = el("button", "btn btn-ghost btn-sm");
+      btn.textContent = label;
+      btn.addEventListener("click", () => {
+        q.type   = toType;
+        q.layout = toLayout;
+        renderSidebar();
+        renderEditor();
+      });
+      convertWrap.appendChild(btn);
+    });
+
+    heading.appendChild(convertWrap);
+  }
+
+  container.appendChild(heading);
+
+  // Text
+  container.appendChild(field("Question text", textareaInput(q.text, v => { q.text = v; renderSidebar(); }, 2)));
+
+  // Label (most types)
+  if (LABEL_TYPES.has(q.type)) {
+    const lf = field("Label (CSV column name)", textInput(q.label, v => { q.label = v; }));
+    lf.appendChild(hint("Used as the column header in exported data. No spaces; use underscores."));
+    container.appendChild(lf);
+  }
+
+  // Required
+  const reqWrap = el("div", "field-group");
+  const reqLabel = el("label", "checkbox-row");
+  const reqCb = document.createElement("input");
+  reqCb.type = "checkbox"; reqCb.checked = !!q.required;
+  reqCb.addEventListener("change", () => { q.required = reqCb.checked; });
+  reqLabel.appendChild(reqCb);
+  reqLabel.appendChild(span("Required"));
+  reqWrap.appendChild(reqLabel);
+  container.appendChild(reqWrap);
+
+  // Layout selector (radio and checkbox only, not dropdown)
+  if (q.type === "radio" || q.type === "checkbox") {
+    const layoutWrap = el("div", "field-group");
+    const layoutLbl = el("label", "field-label");
+    layoutLbl.textContent = "Layout";
+    layoutWrap.appendChild(layoutLbl);
+
+    const layoutRow = el("div");
+    layoutRow.style.cssText = "display:flex; gap:0.5rem; flex-wrap:wrap;";
+
+    [
+      [null,         "Default (vertical)"],
+      ["two_col",    "Two columns"],
+      ["horizontal", "Horizontal"],
+    ].forEach(([val, label]) => {
+      const btn = el("button", "btn btn-ghost btn-sm");
+      btn.textContent = label;
+      if ((q.layout || null) === val) {
+        btn.style.borderColor = "var(--accent)";
+        btn.style.color = "var(--accent)";
+      }
+      btn.addEventListener("click", () => { q.layout = val; renderEditor(); });
+      layoutRow.appendChild(btn);
+    });
+
+    layoutWrap.appendChild(layoutRow);
+    container.appendChild(layoutWrap);
+  }
+
+  // Disable toggle
+  const disableWrap = el("div", "field-group");
+  const disableLabel = el("label", "checkbox-row");
+  const disableCb = document.createElement("input");
+  disableCb.type = "checkbox"; disableCb.checked = !!q.disabled;
+  disableCb.addEventListener("change", () => {
+    q.disabled = disableCb.checked;
+    renderSidebar();
+  });
+  disableLabel.appendChild(disableCb);
+  disableLabel.appendChild(span("Disabled (excluded from survey, kept for reference)"));
+  disableWrap.appendChild(disableLabel);
+  container.appendChild(disableWrap);
+
+  // warn_if_empty toggle
+  const quietByDefault = new Set(["checkbox", "text", "textarea", "checkbox_grid"]);
+  const warnDefault = !quietByDefault.has(q.type);
+  const effectiveWarn = q.warn_if_empty !== null && q.warn_if_empty !== undefined ? q.warn_if_empty : warnDefault;
+  const warnWrap = el("div", "field-group");
+  const warnLabel = el("label", "checkbox-row");
+  const warnCb = document.createElement("input");
+  warnCb.type = "checkbox"; warnCb.checked = effectiveWarn;
+  warnCb.addEventListener("change", () => {
+    q.warn_if_empty = warnCb.checked;
+  });
+  warnLabel.appendChild(warnCb);
+  warnLabel.appendChild(span("Warn if left blank (soft prompt when continuing, does not block)"));
+  warnWrap.appendChild(warnLabel);
+  container.appendChild(warnWrap);
+
+  // Notes
+  const notesField = field("Notes (shown to respondent)", textareaInput(q.notes || "", v => { q.notes = v.trim() || null; }, 3));
+  notesField.appendChild(hint("Optional. Use to define terms or provide context. Leave blank to show no note."));
+  container.appendChild(notesField);
+
+  const noteTitleField = field("Note title", textInput(q.note_title !== undefined ? q.note_title : "Note", v => { q.note_title = v; }));
+  noteTitleField.appendChild(hint("Shown above the note text. Leave blank for no title."));
+  container.appendChild(noteTitleField);
+
+  // Note position
+  const isGrid = ["radio_grid","checkbox_grid","rating_grid","number_grid"].includes(q.type);
+  if (!isGrid) {
+    const posWrap = el("div", "field-group");
+    const posLbl = el("label", "field-label");
+    posLbl.textContent = "Note position";
+    posWrap.appendChild(posLbl);
+    const posRow = el("div");
+    posRow.style.cssText = "display:flex; gap:0.5rem; flex-wrap:wrap;";
+    [["side", "Side panel"], ["below_text", "Below question text"], ["below_answers", "Below answers"]].forEach(([val, label]) => {
+      const btn = el("button", "btn btn-ghost btn-sm");
+      btn.textContent = label;
+      if ((q.note_position || "side") === val) {
+        btn.style.borderColor = "var(--accent)";
+        btn.style.color = "var(--accent)";
+      }
+      btn.addEventListener("click", () => { q.note_position = val; renderEditor(); });
+      posRow.appendChild(btn);
+    });
+    posWrap.appendChild(posRow);
+    container.appendChild(posWrap);
+  }
+
+  container.appendChild(el("div", "divider"));
+
+  // Type-specific fields
+  if (OPTION_TYPES.has(q.type)) {
+    container.appendChild(optionsEditor(q));
+  }
+
+  if (q.type === "number") {
+    container.appendChild(numberFields(q));
+  }
+
+  if (q.type === "number_grid") {
+    container.appendChild(numberFields(q));
+  }
+
+  if (q.type === "rating") {
+    container.appendChild(ratingFields(q, false));
+  }
+
+  if (HAS_ROWS.has(q.type)) {
+    container.appendChild(gridEditor(q));
+  }
+
+  if (q.type === "rating_grid") {
+    container.appendChild(ratingFields(q, true));
+  }
+
+  container.appendChild(el("div", "divider"));
+
+  // display_if
+  const availQ = questionsBefore(selected.pageId, q.id);
+  container.appendChild(conditionSection("Show this question conditionally", q, availQ, () => renderSidebar()));
+
+  container.appendChild(el("div", "divider"));
+
+  // defines_variable
+  container.appendChild(variableEditor(q));
+
+  // Show available variables hint
+  const availVars = getAvailableVariables(selected.pageId, q.id);
+  if (availVars.length > 0) {
+    const varHint = el("div", "field-group");
+    const varHintTitle = el("div", "section-title");
+    varHintTitle.textContent = "Available variables";
+    varHint.appendChild(varHintTitle);
+    const varHintText = el("div", "field-hint");
+    varHintText.style.marginTop = "0";
+    varHintText.innerHTML = "Use in question text, option text, or notes: " +
+      availVars.map(v => `<code style="background:var(--bg-4);padding:1px 4px;border-radius:2px;font-family:var(--mono);font-size:0.75rem">{${escHtml(v)}}</code>`).join(", ");
+    varHint.appendChild(varHintText);
+    container.appendChild(varHint);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Field helpers
+// ---------------------------------------------------------------------------
+
+function el(tag, className) {
+  const e = document.createElement(tag);
+  if (className) e.className = className;
+  return e;
+}
+
+function span(text) {
+  const s = document.createElement("span");
+  s.textContent = text;
+  return s;
+}
+
+function hint(text) {
+  const d = el("div", "field-hint");
+  d.textContent = text;
+  return d;
+}
+
+function field(labelText, inputEl) {
+  const wrap = el("div", "field-group");
+  const lbl = document.createElement("label");
+  lbl.className = "field-label";
+  lbl.textContent = labelText;
+  wrap.appendChild(lbl);
+  wrap.appendChild(inputEl);
+  return wrap;
+}
+
+function textInput(value, onChange) {
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "field-input";
+  input.value = value || "";
+  input.addEventListener("input", () => onChange(input.value));
+  return input;
+}
+
+function textareaInput(value, onChange, rows = 3) {
+  const ta = document.createElement("textarea");
+  ta.className = "field-input";
+  ta.rows = rows;
+  ta.value = value || "";
+  ta.addEventListener("input", () => onChange(ta.value));
+  return ta;
+}
+
+function numberInput(value, onChange, min, max) {
+  const input = document.createElement("input");
+  input.type = "number";
+  input.className = "field-input";
+  input.value = value !== undefined && value !== "" ? value : "";
+  if (min !== undefined) input.min = min;
+  if (max !== undefined) input.max = max;
+  input.addEventListener("input", () => onChange(input.value === "" ? "" : Number(input.value)));
+  return input;
+}
+
+// ---------------------------------------------------------------------------
+// Options editor
+// ---------------------------------------------------------------------------
+
+function optionsEditor(q) {
+  const section = el("div", "field-group");
+  const title = el("div", "section-title");
+  title.textContent = "Options";
+  section.appendChild(title);
+
+  const list = el("div", "options-editor");
+  section.appendChild(list);
+
+  const renderOptions = () => {
+    list.innerHTML = "";
+    q.options.forEach((opt, i) => {
+      const row = el("div", "option-row");
+
+      // Text input
+      const textI = document.createElement("input");
+      textI.type = "text"; textI.placeholder = "Option text";
+      textI.value = opt.text;
+      textI.addEventListener("input", () => { opt.text = textI.value; });
+
+      // Sep
+      const sep = el("span", "option-row-sep");
+      sep.textContent = "→";
+
+      // Value input
+      const valI = document.createElement("input");
+      valI.type = "text"; valI.placeholder = "value";
+      valI.className = "mono-input";
+      valI.value = opt.value;
+      valI.addEventListener("input", () => { opt.value = valI.value; });
+
+      // Condition indicator
+      const condBtn = el("span", "option-has-condition");
+      condBtn.title = "Edit display condition for this option";
+      condBtn.textContent = opt.display_if ? "if ✓" : "if";
+      condBtn.addEventListener("click", () => openOptionConditionModal(q, opt, condBtn));
+
+      // Delete button
+      const delBtn = el("button", "btn btn-icon");
+      delBtn.textContent = "✕"; delBtn.title = "Remove option";
+      delBtn.style.color = "var(--red)";
+      delBtn.addEventListener("click", () => {
+        q.options.splice(i, 1);
+        renderOptions();
+      });
+
+      // Reorder
+      const upBtn = el("button", "btn btn-icon");
+      upBtn.textContent = "↑"; upBtn.title = "Move up";
+      upBtn.addEventListener("click", () => {
+        if (i > 0) { [q.options[i-1], q.options[i]] = [q.options[i], q.options[i-1]]; renderOptions(); }
+      });
+
+      row.appendChild(textI);
+      row.appendChild(sep);
+      row.appendChild(valI);
+      row.appendChild(condBtn);
+      row.appendChild(upBtn);
+      row.appendChild(delBtn);
+      list.appendChild(row);
+    });
+  };
+  renderOptions();
+
+  const addBtn = document.createElement("button");
+  addBtn.className = "btn btn-ghost btn-sm";
+  addBtn.textContent = "+ Add option";
+  addBtn.addEventListener("click", () => {
+    const nextVal = q.type === "radio" ? String(q.options.length) : "";
+    q.options.push(newOption(nextVal));
+    renderOptions();
+  });
+  section.appendChild(addBtn);
+
+  return section;
+}
+
+// Option condition modal (reuses condition builder inline)
+let _optCondTarget = null;
+function openOptionConditionModal(q, opt, btn) {
+  _optCondTarget = { q, opt, btn };
+  // Show inline below the button — actually open a small modal
+  const availQ = questionsBefore(selected.pageId, q.id);
+  // Reuse description modal as a generic container
+  const modal = document.getElementById("modal-description");
+  const h = modal.querySelector("h3");
+  h.textContent = "Option display condition";
+  const body = modal.querySelector(".field-group");
+  body.innerHTML = "";
+  body.appendChild(conditionSection("Show this option conditionally", opt, availQ, () => {
+    btn.textContent = opt.display_if ? "if ✓" : "if";
+  }));
+  modal.querySelector(".modal-actions").innerHTML = `<button class="btn btn-primary" id="modal-opt-cond-done">Done</button>`;
+  document.getElementById("modal-opt-cond-done").onclick = () => closeModal("modal-description");
+  openModal("modal-description");
+}
+
+// ---------------------------------------------------------------------------
+// Number fields
+// ---------------------------------------------------------------------------
+
+function numberFields(q) {
+  const section = el("div");
+  const title = el("div", "section-title");
+  title.textContent = "Number constraints";
+  section.appendChild(title);
+
+  const row = el("div", "field-row");
+
+  const minGroup = el("div", "field-group");
+  const minLabel = el("label", "field-label"); minLabel.textContent = "Min";
+  const minInput = numberInput(q.min, v => { q.min = v; });
+  minGroup.appendChild(minLabel); minGroup.appendChild(minInput);
+
+  const maxGroup = el("div", "field-group");
+  const maxLabel = el("label", "field-label"); maxLabel.textContent = "Max";
+  const maxInput = numberInput(q.max, v => { q.max = v; });
+  maxGroup.appendChild(maxLabel); maxGroup.appendChild(maxInput);
+
+  row.appendChild(minGroup);
+  row.appendChild(maxGroup);
+  section.appendChild(row);
+
+  const intWrap = el("div", "field-group");
+  const intLabel = el("label", "checkbox-row");
+  const intCb = document.createElement("input");
+  intCb.type = "checkbox"; intCb.checked = !!q.integer_only;
+  intCb.addEventListener("change", () => { q.integer_only = intCb.checked; });
+  intLabel.appendChild(intCb);
+  intLabel.appendChild(span("Integer only (no decimals)"));
+  intWrap.appendChild(intLabel);
+  section.appendChild(intWrap);
+
+  const defGroup = el("div", "field-group");
+  const defLabel = el("label", "field-label"); defLabel.textContent = "Default value";
+  const defInput = numberInput(q.default_value, v => { q.default_value = v; });
+  defInput.placeholder = "None";
+  defGroup.appendChild(defLabel); defGroup.appendChild(defInput);
+  defGroup.appendChild(hint("Pre-filled value. Leave blank for no default."));
+  section.appendChild(defGroup);
+
+  return section;
+}
+
+// ---------------------------------------------------------------------------
+// Rating fields
+// ---------------------------------------------------------------------------
+
+function ratingFields(q, isGrid) {
+  const section = el("div");
+  const title = el("div", "section-title");
+  title.textContent = isGrid ? "Rating scale" : "Rating scale";
+  section.appendChild(title);
+
+  const row = el("div", "field-row");
+
+  const minGroup = el("div", "field-group");
+  const minLabel = el("label", "field-label"); minLabel.textContent = "Min";
+  minGroup.appendChild(minLabel);
+  minGroup.appendChild(numberInput(q.min !== undefined ? q.min : 1, v => { q.min = v === "" ? "" : Number(v); }));
+
+  const maxGroup = el("div", "field-group");
+  const maxLabel = el("label", "field-label"); maxLabel.textContent = "Max";
+  maxGroup.appendChild(maxLabel);
+  maxGroup.appendChild(numberInput(q.max !== undefined ? q.max : 5, v => { q.max = v === "" ? "" : Number(v); }));
+
+  row.appendChild(minGroup);
+  row.appendChild(maxGroup);
+  section.appendChild(row);
+
+  section.appendChild(field("Min label (optional)", textInput(q.min_label || "", v => { q.min_label = v; })));
+  section.appendChild(field("Max label (optional)", textInput(q.max_label || "", v => { q.max_label = v; })));
+
+  return section;
+}
+
+// ---------------------------------------------------------------------------
+// Grid editor
+// ---------------------------------------------------------------------------
+
+function gridEditor(q) {
+  const section = el("div", "field-group");
+  const title = el("div", "section-title");
+  title.textContent = "Grid rows" + (HAS_COLS.has(q.type) ? " & columns" : "");
+  section.appendChild(title);
+
+  const gridWrap = el("div", "grid-editor");
+
+  // Rows
+  const rowsCol = el("div", "grid-editor-col");
+  const rowsTitle = el("div", "section-title");
+  rowsTitle.textContent = "Rows";
+  rowsCol.appendChild(rowsTitle);
+
+  const rowsList = el("div");
+  const renderRows = () => {
+    rowsList.innerHTML = "";
+    (q.rows || []).forEach((row, i) => {
+      const entry = el("div", "grid-row-entry");
+
+      const textI = document.createElement("input");
+      textI.type = "text"; textI.placeholder = "Row text";
+      textI.value = row.text || "";
+      textI.addEventListener("input", () => { row.text = textI.value; });
+
+      const labelKey = q.type === "checkbox_grid" ? "label_prefix" : "label";
+      const labelI = document.createElement("input");
+      labelI.type = "text";
+      labelI.placeholder = q.type === "checkbox_grid" ? "prefix" : "label";
+      labelI.className = "mono-input";
+      labelI.value = row[labelKey] || "";
+      labelI.addEventListener("input", () => { row[labelKey] = labelI.value; });
+
+      const condBtn = el("span", "option-has-condition");
+      condBtn.textContent = row.display_if ? "if ✓" : "if";
+      condBtn.title = "Edit row condition";
+      condBtn.addEventListener("click", () => {
+        const availQ = questionsBefore(selected.pageId, q.id);
+        const modal = document.getElementById("modal-description");
+        modal.querySelector("h3").textContent = "Row display condition";
+        const body = modal.querySelector(".field-group");
+        body.innerHTML = "";
+        body.appendChild(conditionSection("Show this row conditionally", row, availQ, () => {
+          condBtn.textContent = row.display_if ? "if ✓" : "if";
+        }));
+        modal.querySelector(".modal-actions").innerHTML = `<button class="btn btn-primary" id="modal-row-cond-done">Done</button>`;
+        document.getElementById("modal-row-cond-done").onclick = () => closeModal("modal-description");
+        openModal("modal-description");
+      });
+
+      const upBtn = el("button","btn btn-icon"); upBtn.textContent = "↑";
+      upBtn.addEventListener("click", () => {
+        if (i > 0) { [q.rows[i-1], q.rows[i]] = [q.rows[i], q.rows[i-1]]; renderRows(); }
+      });
+      const delBtn = el("button","btn btn-icon"); delBtn.textContent = "✕";
+      delBtn.style.color = "var(--red)";
+      delBtn.addEventListener("click", () => { q.rows.splice(i,1); renderRows(); });
+
+      entry.appendChild(textI);
+      entry.appendChild(labelI);
+      entry.appendChild(condBtn);
+      entry.appendChild(upBtn);
+      entry.appendChild(delBtn);
+      rowsList.appendChild(entry);
+    });
+  };
+  renderRows();
+  rowsCol.appendChild(rowsList);
+
+  const addRowBtn = el("button","btn btn-ghost btn-sm");
+  addRowBtn.textContent = "+ Add row";
+  addRowBtn.addEventListener("click", () => { q.rows.push(newRow(q.type)); renderRows(); });
+  rowsCol.appendChild(addRowBtn);
+  gridWrap.appendChild(rowsCol);
+
+  // Columns (only for radio_grid and checkbox_grid)
+  if (HAS_COLS.has(q.type)) {
+    const colsCol = el("div", "grid-editor-col");
+    const colsTitle = el("div", "section-title");
+    colsTitle.textContent = "Columns";
+    colsCol.appendChild(colsTitle);
+
+    const colsList = el("div");
+    const renderCols = () => {
+      colsList.innerHTML = "";
+      (q.columns || []).forEach((col, i) => {
+        const entry = el("div", "grid-row-entry");
+
+        const textI = document.createElement("input");
+        textI.type = "text"; textI.placeholder = "Column text";
+        textI.value = col.text || "";
+        textI.addEventListener("input", () => { col.text = textI.value; });
+
+        const valI = document.createElement("input");
+        valI.type = "text"; valI.placeholder = "value";
+        valI.className = "mono-input";
+        valI.value = col.value || "";
+        valI.addEventListener("input", () => { col.value = valI.value; });
+
+        const upBtn = el("button","btn btn-icon"); upBtn.textContent = "↑";
+        upBtn.addEventListener("click", () => {
+          if (i > 0) { [q.columns[i-1], q.columns[i]] = [q.columns[i], q.columns[i-1]]; renderCols(); }
+        });
+        const delBtn = el("button","btn btn-icon"); delBtn.textContent = "✕";
+        delBtn.style.color = "var(--red)";
+        delBtn.addEventListener("click", () => { q.columns.splice(i,1); renderCols(); });
+
+        entry.appendChild(textI);
+        entry.appendChild(valI);
+        entry.appendChild(upBtn);
+        entry.appendChild(delBtn);
+        colsList.appendChild(entry);
+      });
+    };
+    renderCols();
+    colsCol.appendChild(colsList);
+
+    const addColBtn = el("button","btn btn-ghost btn-sm");
+    addColBtn.textContent = "+ Add column";
+    addColBtn.addEventListener("click", () => { q.columns.push(newCol()); renderCols(); });
+    colsCol.appendChild(addColBtn);
+    gridWrap.appendChild(colsCol);
+  }
+
+  section.appendChild(gridWrap);
+  return section;
+}
+
+// ---------------------------------------------------------------------------
+// Variable editor
+// ---------------------------------------------------------------------------
+
+function getAvailableVariables(pageId, questionId) {
+  const vars = [];
+  for (const page of allPages()) {
+    for (const q of page.questions) {
+      if (q.id === questionId && page.id === pageId) return vars;
+      if (q.defines_variable && q.defines_variable.name) {
+        vars.push(q.defines_variable.name);
+      }
+    }
+    if (page.id === pageId) return vars;
+  }
+  return vars;
+}
+
+function variableEditor(q) {
+  const section = el("div");
+  const title = el("div", "section-title");
+  title.textContent = "Define variable from answer";
+  section.appendChild(title);
+
+  const hintEl = el("div", "field-hint");
+  hintEl.style.marginTop = "0";
+  hintEl.style.marginBottom = "0.75rem";
+  hintEl.textContent = "Makes this question's answer available as {variable_name} in later text, and as $variable_name in display_if conditions.";
+  section.appendChild(hintEl);
+
+  const hasVar = !!q.defines_variable;
+
+  // Toggle
+  const toggleWrap = el("div", "field-group");
+  const toggleLabel = el("label", "checkbox-row");
+  const toggleCb = document.createElement("input");
+  toggleCb.type = "checkbox";
+  toggleCb.checked = hasVar;
+  toggleCb.addEventListener("change", () => {
+    if (toggleCb.checked) {
+      q.defines_variable = { name: "", mapping: null };
+    } else {
+      q.defines_variable = null;
+    }
+    renderEditor();
+  });
+  toggleLabel.appendChild(toggleCb);
+  toggleLabel.appendChild(span("This question defines a variable"));
+  toggleWrap.appendChild(toggleLabel);
+  section.appendChild(toggleWrap);
+
+  if (!hasVar) return section;
+
+  const v = q.defines_variable;
+
+  // Variable name
+  const nameField = field("Variable name", textInput(v.name || "", val => { v.name = val; }));
+  nameField.appendChild(hint("Use letters, digits, and underscores. Referenced as {name} in text."));
+  section.appendChild(nameField);
+
+  // Mapping toggle
+  const hasMappingCb = document.createElement("input");
+  hasMappingCb.type = "checkbox";
+  hasMappingCb.checked = v.mapping !== null && v.mapping !== undefined;
+  const mappingToggle = el("div", "field-group");
+  const mappingToggleLabel = el("label", "checkbox-row");
+  hasMappingCb.addEventListener("change", () => {
+    if (hasMappingCb.checked) {
+      // Pre-fill mapping from options if available
+      const m = {};
+      if (q.options && q.options.length) {
+        q.options.forEach(o => { if (o.value) m[o.value] = o.text || o.value; });
+      }
+      v.mapping = m;
+    } else {
+      v.mapping = null;
+    }
+    renderEditor();
+  });
+  mappingToggleLabel.appendChild(hasMappingCb);
+  mappingToggleLabel.appendChild(span("Custom mapping (otherwise uses raw answer value)"));
+  mappingToggle.appendChild(mappingToggleLabel);
+  section.appendChild(mappingToggle);
+
+  // Mapping entries
+  if (v.mapping !== null && v.mapping !== undefined) {
+    const mapWrap = el("div", "condition-wrap");
+    const mapTitle = el("div", "field-hint");
+    mapTitle.style.marginBottom = "0.5rem";
+    mapTitle.textContent = "Answer value → display text";
+    mapWrap.appendChild(mapTitle);
+
+    const entries = Object.entries(v.mapping);
+    const entriesList = el("div", "options-editor");
+
+    const renderEntries = () => {
+      entriesList.innerHTML = "";
+      Object.entries(v.mapping).forEach(([key, val]) => {
+        const row = el("div", "option-row");
+        const keyI = document.createElement("input");
+        keyI.type = "text"; keyI.placeholder = "answer value";
+        keyI.className = "mono-input"; keyI.style.maxWidth = "140px";
+        keyI.value = key;
+        const sep = el("span", "option-row-sep"); sep.textContent = "→";
+        const valI = document.createElement("input");
+        valI.type = "text"; valI.placeholder = "display text";
+        valI.value = val;
+        valI.style.flex = "1";
+
+        keyI.addEventListener("input", () => {
+          // Rename the key
+          const newMapping = {};
+          Object.entries(v.mapping).forEach(([k, v2]) => {
+            newMapping[k === key ? keyI.value : k] = v2;
+          });
+          v.mapping = newMapping;
+        });
+        valI.addEventListener("input", () => { v.mapping[keyI.value] = valI.value; });
+
+        const delBtn = el("button", "btn btn-icon");
+        delBtn.textContent = "✕"; delBtn.style.color = "var(--red)";
+        delBtn.addEventListener("click", () => { delete v.mapping[key]; renderEntries(); });
+
+        row.appendChild(keyI);
+        row.appendChild(sep);
+        row.appendChild(valI);
+        row.appendChild(delBtn);
+        entriesList.appendChild(row);
+      });
+    };
+    renderEntries();
+    mapWrap.appendChild(entriesList);
+
+    const addEntryBtn = el("button", "btn btn-ghost btn-sm");
+    addEntryBtn.textContent = "+ Add mapping";
+    addEntryBtn.addEventListener("click", () => { v.mapping[""] = ""; renderEntries(); });
+    mapWrap.appendChild(addEntryBtn);
+
+    // Auto-fill button if question has options
+    if (q.options && q.options.length) {
+      const autoBtn = el("button", "btn btn-ghost btn-sm");
+      autoBtn.textContent = "Auto-fill from options";
+      autoBtn.style.marginLeft = "0.5rem";
+      autoBtn.addEventListener("click", () => {
+        q.options.forEach(o => { if (o.value) v.mapping[o.value] = o.text || o.value; });
+        renderEntries();
+      });
+      mapWrap.appendChild(autoBtn);
+    }
+
+    section.appendChild(mapWrap);
+  }
+
+  return section;
+}
+
+// ---------------------------------------------------------------------------
+// Condition clipboard (for copy/paste of conditions)
+// ---------------------------------------------------------------------------
+
+let _conditionClipboard = null;
+
+function copyCondition(cond) {
+  _conditionClipboard = JSON.parse(JSON.stringify(cond));
+  showToast("Condition copied");
+}
+
+function pasteCondition() {
+  if (!_conditionClipboard) return null;
+  return JSON.parse(JSON.stringify(_conditionClipboard));
+}
+
+// ---------------------------------------------------------------------------
+// Condition builder
+// ---------------------------------------------------------------------------
+
+function conditionSection(titleText, target, availableQuestions, onChange) {
+  const wrap = el("div");
+  const secTitle = el("div", "section-title");
+  secTitle.textContent = titleText;
+  wrap.appendChild(secTitle);
+
+  const condWrap = el("div", "condition-wrap");
+  wrap.appendChild(condWrap);
+
+  const toggleRow = el("div", "condition-toggle");
+  const lblAlways = document.createElement("label");
+  const rbAlways = document.createElement("input");
+  rbAlways.type = "radio"; rbAlways.name = "cond_" + target.id;
+  rbAlways.value = "always"; rbAlways.checked = !target.display_if;
+  lblAlways.appendChild(rbAlways); lblAlways.appendChild(span(" Always show"));
+
+  const lblCond = document.createElement("label");
+  const rbCond = document.createElement("input");
+  rbCond.type = "radio"; rbCond.name = "cond_" + target.id;
+  rbCond.value = "conditional"; rbCond.checked = !!target.display_if;
+  lblCond.appendChild(rbCond); lblCond.appendChild(span(" Show conditionally"));
+
+  toggleRow.appendChild(lblAlways);
+  toggleRow.appendChild(lblCond);
+  condWrap.appendChild(toggleRow);
+
+  const builderWrap = el("div");
+  builderWrap.style.display = target.display_if ? "" : "none";
+  condWrap.appendChild(builderWrap);
+
+  const rebuildBuilder = () => {
+    builderWrap.innerHTML = "";
+    if (!target.display_if) return;
+
+    const toolbar = el("div", "cond-toolbar");
+    const copyBtn = el("button", "btn btn-ghost btn-sm");
+    copyBtn.textContent = "\u29C9 Copy all";
+    copyBtn.addEventListener("click", () => copyCondition(target.display_if));
+
+    const pasteBtn = el("button", "btn btn-ghost btn-sm");
+    pasteBtn.textContent = "\uD83D\uDCCB Paste" + (_conditionClipboard ? "" : " (empty)");
+    pasteBtn.disabled = !_conditionClipboard;
+    pasteBtn.addEventListener("click", () => {
+      const pasted = pasteCondition();
+      if (pasted) { target.display_if = pasted; rebuildBuilder(); onChange && onChange(); }
+    });
+
+    toolbar.appendChild(copyBtn);
+    toolbar.appendChild(pasteBtn);
+    builderWrap.appendChild(toolbar);
+
+    builderWrap.appendChild(renderConditionNode(target.display_if, availableQuestions, () => {
+      onChange && onChange();
+    }, (newCond) => {
+      target.display_if = newCond;
+      rebuildBuilder();
+      onChange && onChange();
+    }));
+
+    // If the root node is NOT a group (and/or), show an "+ Add condition" button
+    // that wraps the current root in an AND group with a new empty sibling
+    const rootOp = target.display_if && target.display_if.operator;
+    if (rootOp !== "and" && rootOp !== "or") {
+      const addBtn = el("button", "btn btn-ghost btn-sm");
+      addBtn.textContent = "+ Add condition";
+      addBtn.style.marginTop = "0.35rem";
+      addBtn.addEventListener("click", () => {
+        target.display_if = {
+          operator: "and",
+          conditions: [
+            JSON.parse(JSON.stringify(target.display_if)),
+            { question: "", operator: "equals", value: "" }
+          ]
+        };
+        rebuildBuilder();
+        onChange && onChange();
+      });
+      builderWrap.appendChild(addBtn);
+    }
+  };
+
+  rbAlways.addEventListener("change", () => {
+    if (rbAlways.checked) {
+      target.display_if = null;
+      builderWrap.style.display = "none";
+      builderWrap.innerHTML = "";
+      onChange && onChange();
+    }
+  });
+
+  rbCond.addEventListener("change", () => {
+    if (rbCond.checked) {
+      builderWrap.style.display = "";
+      if (!target.display_if) {
+        if (_conditionClipboard) {
+          target.display_if = pasteCondition();
+        } else {
+          target.display_if = { question: "", operator: "equals", value: "" };
+        }
+      }
+      rebuildBuilder();
+      onChange && onChange();
+    }
+  });
+
+  if (target.display_if) rebuildBuilder();
+  return wrap;
+}
+
+function renderConditionNode(node, availQ, onChange, onReplace) {
+  if (!node) return el("div");
+  if (node.operator === "and" || node.operator === "or") return renderConditionGroup(node, availQ, onChange, onReplace);
+  if (node.operator === "not") return renderConditionNot(node, availQ, onChange, onReplace);
+  return renderConditionLeaf(node, availQ, onChange, onReplace);
+}
+
+function renderConditionLeaf(node, availQ, onChange, onReplace) {
+  const wrap = el("div", "condition-builder");
+  const leafRow = el("div", "condition-leaf");
+
+  const qSel = document.createElement("select");
+  qSel.className = "q-select";
+  const blankOpt = document.createElement("option");
+  blankOpt.value = ""; blankOpt.textContent = "\u2014 pick question \u2014";
+  qSel.appendChild(blankOpt);
+
+  let currentGroup = null;
+  availQ.forEach(q => {
+    const isSubItem = q.type.endsWith("_row") || q.type === "number_grid_cell";
+    if (isSubItem && q._parentId) {
+      if (!currentGroup || currentGroup.dataset.parentId !== q._parentId) {
+        currentGroup = document.createElement("optgroup");
+        currentGroup.label = "\u21B3 " + (q.type === "number_grid_cell" ? "cells" : "rows") + " of: " + (q._parentText || q._parentId).slice(0,35);
+        currentGroup.dataset.parentId = q._parentId;
+        qSel.appendChild(currentGroup);
+      }
+      const o = document.createElement("option");
+      o.value = q.id;
+      o.textContent = (q.label || q.id) + " \u2014 " + (q.text || "").slice(0,30);
+      if (q.id === node.question) o.selected = true;
+      currentGroup.appendChild(o);
+    } else {
+      currentGroup = null;
+      const o = document.createElement("option");
+      o.value = q.id;
+      o.textContent = (q.label || q.id) + (q.text ? " \u2014 " + q.text.slice(0,30) : "");
+      if (q.id === node.question) o.selected = true;
+      qSel.appendChild(o);
+    }
+  });
+
+  // Add variable entries — collect all variables defined by questions in availQ
+  const varNames = new Set();
+  for (const page of allPages()) {
+    for (const q of page.questions) {
+      if (q.defines_variable && q.defines_variable.name) {
+        // Only include if the defining question is in availQ (respects ordering)
+        if (availQ.some(aq => aq.id === q.id)) {
+          varNames.add(q.defines_variable.name);
+        }
+      }
+    }
+  }
+  if (varNames.size > 0) {
+    const varGroup = document.createElement("optgroup");
+    varGroup.label = "\u{1F4CC} Variables";
+    for (const vn of [...varNames].sort()) {
+      const o = document.createElement("option");
+      o.value = "$" + vn;
+      o.textContent = "$" + vn;
+      if (("$" + vn) === node.question) o.selected = true;
+      varGroup.appendChild(o);
+    }
+    qSel.appendChild(varGroup);
+  }
+
+  const opSel = document.createElement("select");
+  opSel.className = "op-select";
+  const rebuildOps = () => {
+    const currentQ = availQ.find(q => q.id === qSel.value);
+    const isCheckbox = currentQ && (currentQ.type === "checkbox" || currentQ.type === "checkbox_grid" || currentQ.type === "checkbox_grid_row");
+    const isVar = qSel.value && qSel.value.startsWith("$");
+    opSel.innerHTML = "";
+    const ops = [
+      ["equals","equals"], ["not_equals","not equals"],
+      ...(!isVar && isCheckbox ? [["includes","includes"],["not_includes","not includes"]] : []),
+      ...(!isVar && isCheckbox ? [["count_equals","count ="],["count_not_equals","count \u2260"],["count_gt","count >"],["count_gte","count \u2265"],["count_lt","count <"],["count_lte","count \u2264"]] : []),
+      ["is_answered","is answered"], ["is_not_answered","is not answered"],
+    ];
+    ops.forEach(([val, label]) => {
+      const o = document.createElement("option");
+      o.value = val; o.textContent = label;
+      if (val === node.operator) o.selected = true;
+      opSel.appendChild(o);
+    });
+  };
+  rebuildOps();
+
+  const valWrap = el("span");
+  const rebuildVal = () => {
+    valWrap.innerHTML = "";
+    const currentQ = availQ.find(q => q.id === qSel.value);
+    const op = opSel.value;
+    if (op === "is_answered" || op === "is_not_answered") return;
+    if (op.startsWith("count_")) {
+      const vInput = document.createElement("input");
+      vInput.type = "number"; vInput.className = "val-input";
+      vInput.placeholder = "count"; vInput.min = "0"; vInput.step = "1";
+      vInput.value = node.value || "";
+      vInput.addEventListener("input", () => { node.value = vInput.value; onChange(); });
+      valWrap.appendChild(vInput);
+      return;
+    }
+    let valueOptions = null;
+    if (currentQ) {
+      if (OPTION_TYPES.has(currentQ.type) && currentQ.options && currentQ.options.length) {
+        valueOptions = currentQ.options.map(o => ({ value: o.value, text: o.text || o.value }));
+      } else if (currentQ.type === "radio_grid" && currentQ.options && currentQ.options.length) {
+        valueOptions = currentQ.options.map(o => ({ value: o.value, text: o.text || o.value }));
+      } else if (currentQ.type === "radio_grid_row" && currentQ.columns && currentQ.columns.length) {
+        valueOptions = currentQ.columns.map(c => ({ value: c.value, text: c.text || c.value }));
+      } else if (currentQ.type === "checkbox_grid_row" && currentQ.columns && currentQ.columns.length) {
+        valueOptions = currentQ.columns.map(c => ({ value: c.value, text: c.text || c.value }));
+      } else if (currentQ.type === "rating_grid_row" && currentQ.min !== undefined && currentQ.max !== undefined) {
+        const vals = [];
+        for (let i = currentQ.min; i <= currentQ.max; i++) vals.push({ value: String(i), text: String(i) });
+        valueOptions = vals;
+      }
+    }
+    if (valueOptions) {
+      const vSel = document.createElement("select");
+      vSel.className = "val-input";
+      const blank = document.createElement("option"); blank.value = ""; blank.textContent = "\u2014 value \u2014";
+      vSel.appendChild(blank);
+      valueOptions.forEach(o => {
+        const opt = document.createElement("option");
+        opt.value = o.value; opt.textContent = o.text;
+        if (o.value === node.value) opt.selected = true;
+        vSel.appendChild(opt);
+      });
+      vSel.addEventListener("change", () => { node.value = vSel.value; onChange(); });
+      valWrap.appendChild(vSel);
+    } else {
+      const vInput = document.createElement("input");
+      vInput.type = "text"; vInput.className = "val-input";
+      vInput.placeholder = "value"; vInput.value = node.value || "";
+      vInput.addEventListener("input", () => { node.value = vInput.value; onChange(); });
+      valWrap.appendChild(vInput);
+    }
+  };
+  rebuildVal();
+
+  qSel.addEventListener("change", () => { node.question = qSel.value; rebuildOps(); rebuildVal(); onChange(); });
+  opSel.addEventListener("change", () => { node.operator = opSel.value; rebuildVal(); onChange(); });
+
+  leafRow.appendChild(qSel);
+  leafRow.appendChild(opSel);
+  leafRow.appendChild(valWrap);
+
+  const actions = el("span", "cond-node-actions");
+  const copyBtn = el("button", "btn btn-icon"); copyBtn.textContent = "\u29C9"; copyBtn.title = "Copy";
+  copyBtn.addEventListener("click", () => copyCondition(node));
+  const notBtn = el("button", "btn btn-icon"); notBtn.textContent = "\u00AC"; notBtn.title = "Wrap in NOT";
+  notBtn.addEventListener("click", () => { onReplace({ operator: "not", conditions: [{ ...node }] }); });
+  const groupBtn = el("button", "btn btn-icon"); groupBtn.textContent = "{ }"; groupBtn.title = "Wrap in AND/OR group";
+  groupBtn.addEventListener("click", () => { onReplace({ operator: "and", conditions: [{ ...node }, { question: "", operator: "equals", value: "" }] }); });
+  const delBtn = el("button", "btn btn-icon"); delBtn.textContent = "\u2715"; delBtn.title = "Remove";
+  delBtn.style.color = "var(--red)";
+  delBtn.addEventListener("click", () => onReplace(null));
+  actions.appendChild(copyBtn); actions.appendChild(notBtn); actions.appendChild(groupBtn); actions.appendChild(delBtn);
+  leafRow.appendChild(actions);
+
+  wrap.appendChild(leafRow);
+  return wrap;
+}
+
+function renderConditionNot(node, availQ, onChange, onReplace) {
+  const wrap = el("div", "condition-builder");
+  const notBox = el("div", "condition-not");
+
+  const header = el("div", "condition-not-header");
+  const label = el("span", "condition-not-label"); label.textContent = "NOT";
+  header.appendChild(label);
+
+  const actions = el("span", "cond-node-actions");
+  const copyBtn = el("button", "btn btn-icon"); copyBtn.textContent = "\u29C9"; copyBtn.title = "Copy NOT block";
+  copyBtn.addEventListener("click", () => copyCondition(node));
+  const unwrapBtn = el("button", "btn btn-icon"); unwrapBtn.textContent = "\u2191"; unwrapBtn.title = "Unwrap \u2014 remove NOT";
+  unwrapBtn.addEventListener("click", () => { if (node.conditions.length > 0) onReplace(node.conditions[0]); });
+  const delBtn = el("button", "btn btn-icon"); delBtn.textContent = "\u2715"; delBtn.title = "Remove";
+  delBtn.style.color = "var(--red)";
+  delBtn.addEventListener("click", () => onReplace(null));
+  actions.appendChild(copyBtn); actions.appendChild(unwrapBtn); actions.appendChild(delBtn);
+  header.appendChild(actions);
+  notBox.appendChild(header);
+
+  const childWrap = el("div", "condition-not-body");
+  const rebuildChild = () => {
+    childWrap.innerHTML = "";
+    if (node.conditions.length === 0) node.conditions.push({ question: "", operator: "equals", value: "" });
+    childWrap.appendChild(renderConditionNode(node.conditions[0], availQ, () => { onChange(); rebuildChild(); }, (newChild) => {
+      if (newChild === null) onReplace(null);
+      else { node.conditions[0] = newChild; rebuildChild(); }
+      onChange();
+    }));
+  };
+  rebuildChild();
+  notBox.appendChild(childWrap);
+
+  wrap.appendChild(notBox);
+  return wrap;
+}
+
+function renderConditionGroup(node, availQ, onChange, onReplace) {
+  const wrap = el("div", "condition-builder");
+  const group = el("div", "condition-group");
+
+  const header = el("div", "condition-group-header");
+  const andBtn = el("button", "condition-group-op" + (node.operator === "and" ? " active-and" : ""));
+  andBtn.textContent = "AND";
+  andBtn.addEventListener("click", () => { node.operator = "and"; onChange(); andBtn.className = "condition-group-op active-and"; orBtn.className = "condition-group-op"; });
+  const orBtn = el("button", "condition-group-op" + (node.operator === "or" ? " active-or" : ""));
+  orBtn.textContent = "OR";
+  orBtn.addEventListener("click", () => { node.operator = "or"; onChange(); orBtn.className = "condition-group-op active-or"; andBtn.className = "condition-group-op"; });
+  header.appendChild(andBtn); header.appendChild(orBtn);
+
+  const actions = el("span", "cond-node-actions");
+  const copyBtn = el("button", "btn btn-icon"); copyBtn.textContent = "\u29C9"; copyBtn.title = "Copy group";
+  copyBtn.addEventListener("click", () => copyCondition(node));
+  const pasteInBtn = el("button", "btn btn-icon"); pasteInBtn.textContent = "\uD83D\uDCCB"; pasteInBtn.title = "Paste into group";
+  pasteInBtn.addEventListener("click", () => { const p = pasteCondition(); if (p) { node.conditions.push(p); rebuildChildren(); onChange(); } });
+  const notBtn = el("button", "btn btn-icon"); notBtn.textContent = "\u00AC"; notBtn.title = "Wrap in NOT";
+  notBtn.addEventListener("click", () => { onReplace({ operator: "not", conditions: [JSON.parse(JSON.stringify(node))] }); });
+  const unGroupBtn = el("button", "btn btn-icon"); unGroupBtn.textContent = "\u2191"; unGroupBtn.title = "Ungroup";
+  unGroupBtn.addEventListener("click", () => { if (node.conditions.length > 0) onReplace(node.conditions[0]); });
+  const delBtn = el("button", "btn btn-icon"); delBtn.textContent = "\u2715"; delBtn.title = "Remove";
+  delBtn.style.color = "var(--red)";
+  delBtn.addEventListener("click", () => onReplace(null));
+  actions.appendChild(copyBtn); actions.appendChild(pasteInBtn); actions.appendChild(notBtn); actions.appendChild(unGroupBtn); actions.appendChild(delBtn);
+  header.appendChild(actions);
+  group.appendChild(header);
+
+  const selectedIndices = new Set();
+  const childrenWrap = el("div");
+  const rebuildChildren = () => {
+    childrenWrap.innerHTML = "";
+    selectedIndices.clear();
+    node.conditions.forEach((child, i) => {
+      const childRow = el("div", "condition-child-row");
+      const cb = document.createElement("input");
+      cb.type = "checkbox"; cb.className = "cond-select-cb";
+      cb.title = "Select for grouping";
+      cb.addEventListener("change", () => {
+        if (cb.checked) selectedIndices.add(i); else selectedIndices.delete(i);
+        groupSelBtn.style.display = selectedIndices.size >= 2 ? "" : "none";
+      });
+      childRow.appendChild(cb);
+      childRow.appendChild(renderConditionNode(child, availQ, () => { onChange(); rebuildChildren(); }, (newChild) => {
+        if (newChild === null) {
+          node.conditions.splice(i, 1);
+          if (node.conditions.length === 0) onReplace(null);
+          else if (node.conditions.length === 1) onReplace(node.conditions[0]);
+          else rebuildChildren();
+        } else { node.conditions[i] = newChild; rebuildChildren(); }
+        onChange();
+      }));
+      childrenWrap.appendChild(childRow);
+    });
+  };
+  rebuildChildren();
+  group.appendChild(childrenWrap);
+
+  const footer = el("div", "condition-group-footer");
+  const addCondBtn = el("button", "btn btn-ghost btn-sm");
+  addCondBtn.textContent = "+ Add condition";
+  addCondBtn.addEventListener("click", () => { node.conditions.push({ question: "", operator: "equals", value: "" }); rebuildChildren(); onChange(); });
+  footer.appendChild(addCondBtn);
+
+  const groupSelBtn = el("button", "btn btn-ghost btn-sm");
+  groupSelBtn.textContent = "Group selected";
+  groupSelBtn.style.display = "none";
+  groupSelBtn.addEventListener("click", () => {
+    if (selectedIndices.size < 2) return;
+    const sorted = [...selectedIndices].sort((a, b) => a - b);
+    const subGroup = { operator: "and", conditions: sorted.map(i => node.conditions[i]) };
+    for (let j = sorted.length - 1; j >= 0; j--) node.conditions.splice(sorted[j], 1);
+    node.conditions.splice(sorted[0], 0, subGroup);
+    rebuildChildren(); onChange();
+  });
+  footer.appendChild(groupSelBtn);
+
+  group.appendChild(footer);
+  wrap.appendChild(group);
+  return wrap;
+}
+
+// ---------------------------------------------------------------------------
+// YAML export
+// ---------------------------------------------------------------------------
+
+function exportYAML() {
+  const errors = validateState();
+  if (errors.length) {
+    showToast("Fix errors before exporting:\n" + errors.slice(0,3).join("; "), true);
+    return;
+  }
+  const yaml = buildYAML();
+  const blob = new Blob([yaml], { type: "text/yaml" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href = url;
+  a.download = (state.title || "survey").replace(/\s+/g, "_").toLowerCase() + ".yaml";
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast("YAML exported");
+}
+
+function validateState() {
+  const errors = [];
+  const allIds    = new Set();
+
+  const checkId = (id, ctx) => {
+    if (!id) { errors.push(`${ctx}: missing id`); return; }
+    if (allIds.has(id)) errors.push(`Duplicate id: ${id}`);
+    allIds.add(id);
+  };
+
+  if (!state.title.trim()) errors.push("Survey title is required");
+  if (state.page_groups.length === 0) errors.push("Survey must have at least one group");
+
+  state.page_groups.forEach(group => {
+    checkId(group.id, `group "${group.title}"`);
+    if (!group.title.trim()) errors.push(`Group ${group.id}: title is required`);
+    if (group.pages.length === 0) errors.push(`Group "${group.title}": must have at least one page`);
+  });
+
+  // Collect all CSV column names to check for collisions
+  const csvColumns = []; // [{col, source}]
+
+  allPages().forEach(page => {
+    checkId(page.id, `page "${page.title}"`);
+    if (!page.title.trim()) errors.push(`Page ${page.id}: title is required`);
+    const pt = page.page_type || "standard";
+    if (pt === "standard" && page.questions.length === 0) errors.push(`Page "${page.title}": must have at least one question`);
+    if (pt === "breakout" && !(page.acknowledge_text || "").trim()) errors.push(`Breakout page "${page.title}": acknowledgment text is required`);
+
+    page.questions.forEach(q => {
+      checkId(q.id, `question "${q.text}"`);
+      if (!q.text.trim()) errors.push(`Question ${q.id}: text is required`);
+
+      if (LABEL_TYPES.has(q.type)) {
+        if (!q.label.trim()) errors.push(`Question "${q.text || q.id}": label is required`);
+      }
+
+      if (OPTION_TYPES.has(q.type)) {
+        if (!q.options || q.options.length === 0) errors.push(`Question "${q.text}": needs at least one option`);
+        (q.options || []).forEach(o => {
+          if (!String(o.value).trim()) errors.push(`Question "${q.text}": option missing value`);
+          if (!String(o.text).trim())  errors.push(`Question "${q.text}": option missing text`);
+        });
+      }
+
+      if (HAS_ROWS.has(q.type)) {
+        if (!q.rows || q.rows.length === 0) errors.push(`Question "${q.text}": needs at least one row`);
+        (q.rows || []).forEach(r => {
+          checkId(r.id, `row in "${q.text}"`);
+          const lk = q.type === "checkbox_grid" ? "label_prefix" : "label";
+          if (!r[lk]) errors.push(`Row in "${q.text}": missing ${lk}`);
+        });
+      }
+
+      if (HAS_COLS.has(q.type)) {
+        if (!q.columns || q.columns.length === 0) errors.push(`Question "${q.text}": needs at least one column`);
+        (q.columns || []).forEach(c => {
+          if (!String(c.value).trim()) errors.push(`Question "${q.text}": column missing value`);
+          if (!String(c.text).trim())  errors.push(`Question "${q.text}": column missing text`);
+        });
+      }
+
+      if ((q.type === "rating" || q.type === "rating_grid") && (q.min === "" || q.max === "")) {
+        errors.push(`Question "${q.text}": rating min and max are required`);
+      }
+
+      // Compute CSV columns this question would produce
+      const src = `question "${q.text || q.id}"`;
+      if (q.type === "checkbox" && q.label && q.options) {
+        q.options.forEach(o => {
+          if (String(o.value).trim()) csvColumns.push({ col: `${q.label}__${o.value}`, source: src });
+        });
+      } else if (q.type === "checkbox_grid" && q.rows && q.columns) {
+        q.rows.forEach(r => {
+          if (r.label_prefix) q.columns.forEach(c => {
+            if (String(c.value).trim()) csvColumns.push({ col: `${r.label_prefix}__${c.value}`, source: src });
+          });
+        });
+      } else if (q.type === "number_grid" && q.rows && q.columns) {
+        q.rows.forEach(r => {
+          if (r.label) q.columns.forEach(c => {
+            if (String(c.value).trim()) csvColumns.push({ col: `${r.label}__${c.value}`, source: src });
+          });
+        });
+      } else if ((q.type === "radio_grid" || q.type === "rating_grid") && q.rows) {
+        q.rows.forEach(r => {
+          if (r.label) csvColumns.push({ col: r.label, source: src });
+        });
+      } else if (LABEL_TYPES.has(q.type) && q.label) {
+        csvColumns.push({ col: q.label, source: src });
+      }
+    });
+  });
+
+  // Check for CSV column collisions
+  const seen = {};
+  csvColumns.forEach(({ col, source }) => {
+    if (seen[col]) {
+      errors.push(`Duplicate CSV column "${col}" — appears in ${seen[col]} and ${source}`);
+    } else {
+      seen[col] = source;
+    }
+  });
+
+  // Validate variable names are valid identifiers
+  allPages().forEach(page => {
+    page.questions.forEach(q => {
+      if (q.defines_variable && q.defines_variable.name) {
+        const name = q.defines_variable.name;
+        if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(name)) {
+          errors.push(`Variable "${name}" in "${q.text || q.id}": must be a valid identifier (letters, digits, underscores).`);
+        }
+      }
+    });
+  });
+
+  return errors;
+}
+
+function buildYAML() {
+  const lines = [];
+  lines.push(`survey:`);
+  lines.push(`  title: ${yamlStr(state.title)}`);
+  if (state.description) lines.push(...yamlBlock('description', state.description, '  '));
+  lines.push(`  page_groups:`);
+
+  state.page_groups.forEach(group => {
+    lines.push(``);
+    lines.push(`    - id: ${group.id}`);
+    lines.push(`      title: ${yamlStr(group.title)}`);
+    if (group.display_if) lines.push(...indentLines(conditionYAML(group.display_if), "      "));
+    lines.push(`      pages:`);
+
+    group.pages.forEach(page => {
+      lines.push(``);
+      lines.push(`        - id: ${page.id}`);
+      lines.push(`          title: ${yamlStr(page.title)}`);
+      if (page.page_type && page.page_type !== "standard") lines.push(`          page_type: ${page.page_type}`);
+      if (page.description)   lines.push(...yamlBlock('description', page.description, '          '));
+      if (page.builder_notes) lines.push(...yamlBlock('builder_notes', page.builder_notes, '          '));
+      if (page.display_if)    lines.push(...indentLines(conditionYAML(page.display_if), "          "));
+      if (page.page_type === "breakout") {
+        if (page.acknowledge_text)   lines.push(...yamlBlock('acknowledge_text', page.acknowledge_text, '          '));
+        if (page.breakout_button_label && page.breakout_button_label !== "End survey") lines.push(`          breakout_button_label: ${yamlStr(page.breakout_button_label)}`);
+        if (page.continue_button_label && page.continue_button_label !== "Continue")   lines.push(`          continue_button_label: ${yamlStr(page.continue_button_label)}`);
+      }
+      if (page.page_type !== "section_title" && page.page_type !== "breakout") {
+        lines.push(`          questions:`);
+      } else if (page.questions.length > 0) {
+        lines.push(`          questions:`);
+      }
+
+      page.questions.forEach(q => {
+        lines.push(``);
+        lines.push(`            - id: ${q.id}`);
+        if (LABEL_TYPES.has(q.type)) lines.push(`              label: ${q.label}`);
+        lines.push(`              type: ${q.type}`);
+        lines.push(`              text: ${yamlStr(q.text)}`);
+        if (q.disabled) lines.push(`              disabled: true`);
+        if (q.layout)   lines.push(`              layout: ${q.layout}`);
+        if (q.required) lines.push(`              required: true`);
+        if (q.notes)    lines.push(...yamlBlock('notes', q.notes, '              '));
+        if (q.notes && q.note_title !== "Note") lines.push(...yamlBlock('note_title', q.note_title || "", '              '));
+        if (q.note_position && q.note_position !== "side") lines.push(`              note_position: ${q.note_position}`);
+        if (q.warn_if_empty !== null && q.warn_if_empty !== undefined) {
+          const quietByDefault = new Set(["checkbox", "text", "textarea", "checkbox_grid"]);
+          const typeDefault = !quietByDefault.has(q.type);
+          if (q.warn_if_empty !== typeDefault) lines.push(`              warn_if_empty: ${q.warn_if_empty}`);
+        }
+        if (q.display_if) lines.push(...indentLines(conditionYAML(q.display_if), "              "));
+
+        if (q.defines_variable && q.defines_variable.name) {
+          lines.push(`              defines_variable:`);
+          lines.push(`                name: ${q.defines_variable.name}`);
+          if (q.defines_variable.mapping && Object.keys(q.defines_variable.mapping).length > 0) {
+            lines.push(`                mapping:`);
+            Object.entries(q.defines_variable.mapping).forEach(([k, v]) => {
+              lines.push(`                  ${yamlStr(String(k))}: ${yamlStr(String(v))}`);
+            });
+          }
+        }
+
+        if (q.type === "number") {
+          if (q.min !== "" && q.min !== null && q.min !== undefined) lines.push(`              min: ${q.min}`);
+          if (q.max !== "" && q.max !== null && q.max !== undefined) lines.push(`              max: ${q.max}`);
+          if (q.integer_only) lines.push(`              integer_only: true`);
+          if (q.default_value !== "" && q.default_value !== null && q.default_value !== undefined) lines.push(`              default_value: ${q.default_value}`);
+        }
+
+        if (q.type === "number_grid") {
+          if (q.min !== "" && q.min !== null && q.min !== undefined) lines.push(`              min: ${q.min}`);
+          if (q.max !== "" && q.max !== null && q.max !== undefined) lines.push(`              max: ${q.max}`);
+          if (q.integer_only) lines.push(`              integer_only: true`);
+          if (q.default_value !== "" && q.default_value !== null && q.default_value !== undefined) lines.push(`              default_value: ${q.default_value}`);
+        }
+
+        if (q.type === "rating" || (q.type === "rating_grid" && !HAS_ROWS.has("rating"))) {
+          if (q.min !== "" && q.min !== undefined) lines.push(`              min: ${q.min}`);
+          if (q.max !== "" && q.max !== undefined) lines.push(`              max: ${q.max}`);
+          if (q.min_label) lines.push(`              min_label: ${yamlStr(q.min_label)}`);
+          if (q.max_label) lines.push(`              max_label: ${yamlStr(q.max_label)}`);
+        }
+
+        if (q.type === "rating_grid") {
+          if (q.min !== "" && q.min !== undefined) lines.push(`              min: ${q.min}`);
+          if (q.max !== "" && q.max !== undefined) lines.push(`              max: ${q.max}`);
+          if (q.min_label) lines.push(`              min_label: ${yamlStr(q.min_label)}`);
+          if (q.max_label) lines.push(`              max_label: ${yamlStr(q.max_label)}`);
+        }
+
+        if (OPTION_TYPES.has(q.type)) {
+          lines.push(`              options:`);
+          q.options.forEach(o => {
+            lines.push(`                - value: ${yamlStr(String(o.value))}`);
+            lines.push(`                  text: ${yamlStr(o.text)}`);
+            if (o.display_if) lines.push(...indentLines(conditionYAML(o.display_if), "                  "));
+          });
+        }
+
+        if (HAS_COLS.has(q.type)) {
+          lines.push(`              columns:`);
+          q.columns.forEach(c => {
+            lines.push(`                - value: ${yamlStr(String(c.value))}`);
+            lines.push(`                  text: ${yamlStr(c.text)}`);
+          });
+        }
+
+        if (HAS_ROWS.has(q.type)) {
+          lines.push(`              rows:`);
+          q.rows.forEach(r => {
+            lines.push(`                - id: ${r.id}`);
+            if (q.type === "checkbox_grid") lines.push(`                  label_prefix: ${r.label_prefix}`);
+            else lines.push(`                  label: ${r.label}`);
+            lines.push(`                  text: ${yamlStr(r.text)}`);
+            if (r.display_if) lines.push(...indentLines(conditionYAML(r.display_if), "                  "));
+          });
+        }
+      });
+    });
+  });
+
+  return lines.join("\n") + "\n";
+}
+
+function conditionYAML(cond) {
+  if (!cond) return [];
+  const lines = ["display_if:"];
+  lines.push(...condNodeYAML(cond, "  "));
+  return lines;
+}
+
+function condNodeYAML(node, indent) {
+  if (node.operator === "and" || node.operator === "or" || node.operator === "not") {
+    const lines = [`${indent}operator: ${node.operator}`, `${indent}conditions:`];
+    node.conditions.forEach(c => {
+      // Serialize the child at the content indent level (indent + 4 spaces,
+      // to sit inside the "- " sequence item which occupies 2 of those).
+      const contentIndent = indent + "    ";
+      const childLines = condNodeYAML(c, contentIndent);
+      // First line gets the "- " prefix replacing the first 2 chars of indent
+      lines.push(`${indent}  - ${childLines[0].slice(contentIndent.length)}`);
+      // Remaining lines keep their full indentation as-is
+      childLines.slice(1).forEach(l => lines.push(l));
+    });
+    return lines;
+  }
+  const lines = [
+    `${indent}question: ${node.question}`,
+    `${indent}operator: ${node.operator}`,
+  ];
+  if (node.value !== undefined && node.value !== null && node.value !== "" &&
+      node.operator !== "is_answered" && node.operator !== "is_not_answered") {
+    lines.push(`${indent}value: ${yamlStr(String(node.value))}`);
+  }
+  return lines;
+}
+
+function indentLines(lines, prefix) {
+  return lines.map((l, i) => i === 0 ? `${prefix}${l}` : `${prefix}${l}`);
+}
+
+// YAML boolean aliases (any case) that must be quoted to survive PyYAML round-trip
+const YAML_BOOL_ALIASES = new Set([
+  "yes","no","true","false","on","off",
+  "Yes","No","True","False","On","Off",
+  "YES","NO","TRUE","FALSE","ON","OFF",
+]);
+
+function yamlStr(s) {
+  if (s === null || s === undefined || s === "") return '""';
+  const str = String(s);
+  // Multi-line: use literal block scalar
+  if (str.includes("\n")) return null; // signal to caller to use block scalar
+  // Quote YAML boolean aliases, numbers-as-strings, and strings with special chars
+  if (YAML_BOOL_ALIASES.has(str) ||
+      /^-?\d+(\.\d+)?$/.test(str) ||
+      /[:#\[\]{},&*?|\-<>=!%@`'"\\]/.test(str) ||
+      /^\s|\s$/.test(str)) {
+    return `"${str.replace(/\\/g,"\\\\").replace(/"/g,'\\"')}"`;
+  }
+  return str;
+}
+
+// Like yamlStr but for block-level fields that can span lines (description, notes).
+// Returns an array of lines to push rather than a single inline value.
+function yamlBlock(key, s, indent) {
+  if (!s) return [];
+  const str = String(s);
+  if (str.includes("\n")) {
+    const lines = [`${indent}${key}: |`];
+    str.split("\n").forEach(l => lines.push(`${indent}  ${l}`));
+    return lines;
+  }
+  const inline = yamlStr(str);
+  return [`${indent}${key}: ${inline}`];
+}
+
+// ---------------------------------------------------------------------------
+// YAML import
+// ---------------------------------------------------------------------------
+
+function importYAML(text) {
+  try {
+    const parsed = parseYAML(text);
+    if (!parsed || !parsed.survey) throw new Error("Missing top-level 'survey' key");
+    const s = parsed.survey;
+    state.title       = s.title || "Untitled Survey";
+    state.description = s.description || "";
+
+    if (s.page_groups) {
+      state.page_groups = (s.page_groups || []).map(importGroup);
+    } else if (s.pages) {
+      // Legacy format: wrap all pages in a single default group
+      state.page_groups = [{
+        id: uid("group"),
+        title: "All Pages",
+        display_if: null,
+        _open: true,
+        pages: (s.pages || []).map(importPage),
+      }];
+    } else {
+      state.page_groups = [];
+    }
+
+    selected = { type: null, groupId: null, pageId: null, questionId: null };
+    document.getElementById("survey-title-input").value = state.title;
+    renderSidebar();
+    renderEditor();
+    showToast("Survey imported");
+  } catch(e) {
+    showToast("Import failed: " + e.message, true);
+  }
+}
+
+function importGroup(g) {
+  return {
+    id:         g.id || uid("group"),
+    title:      g.title || "Untitled Group",
+    display_if: g.display_if || null,
+    _open:      true,
+    pages:      (g.pages || []).map(importPage),
+  };
+}
+
+function importPage(p) {
+  return {
+    id:            p.id || uid("page"),
+    title:         p.title || "",
+    description:   p.description || "",
+    builder_notes: p.builder_notes || "",
+    display_if:    p.display_if || null,
+    page_type:     p.page_type || "standard",
+    breakout_button_label:  p.breakout_button_label || "End survey",
+    continue_button_label:  p.continue_button_label || "Continue",
+    acknowledge_text:       p.acknowledge_text || "",
+    _open:         true,
+    questions:     (p.questions || []).map(importQuestion),
+  };
+}
+
+function importQuestion(q) {
+  const out = {
+    id:         q.id || uid("q"),
+    type:       q.type,
+    text:       q.text || "",
+    label:      q.label || "",
+    required:   !!q.required,
+    disabled:   !!q.disabled,
+    layout:     q.layout || null,
+    notes:      q.notes || null,
+    note_title: q.note_title !== undefined ? q.note_title : "Note",
+    note_position: q.note_position || "side",
+    warn_if_empty: q.warn_if_empty !== undefined ? q.warn_if_empty : null,
+    display_if: q.display_if || null,
+  };
+  if (q.options)     out.options  = q.options.map(o => ({ id: uid("opt"), value: o.value !== undefined ? String(o.value) : "", text: o.text||"", display_if: o.display_if||null }));
+  if (q.rows)        out.rows     = q.rows.map(r => ({ id: r.id||uid("row"), text: r.text||"", label: r.label||"", label_prefix: r.label_prefix||"", display_if: r.display_if||null }));
+  if (q.columns)     out.columns  = q.columns.map(c => ({ id: uid("col"), value: c.value !== undefined ? String(c.value) : "", text: c.text||"" }));
+  if (q.min !== undefined) out.min = q.min;
+  if (q.max !== undefined) out.max = q.max;
+  if (q.integer_only !== undefined) out.integer_only = q.integer_only;
+  if (q.default_value !== undefined) out.default_value = q.default_value;
+  if (q.min_label !== undefined) out.min_label = q.min_label;
+  if (q.max_label !== undefined) out.max_label = q.max_label;
+  if (q.defines_variable) {
+    out.defines_variable = {
+      name: q.defines_variable.name || "",
+      mapping: q.defines_variable.mapping || null,
+    };
+  } else {
+    out.defines_variable = null;
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------------------
+// Minimal YAML parser (subset — handles our own output format)
+// ---------------------------------------------------------------------------
+
+function parseYAML(text) {
+  // We need to parse the YAML we produce. Since we control the format,
+  // we can use a structured approach: convert to JSON-like structure.
+  // This handles: mappings, sequences, quoted strings, booleans, numbers.
+  const lines = text.split("\n");
+  const root = {};
+  parseYAMLBlock(lines, 0, root);
+  return root;
+}
+
+function parseYAMLBlock(lines, baseIndent, out) {
+  let i = 0;
+
+  const getIndent = (line) => {
+    if (!line.trim() || line.trim().startsWith("#")) return -1;
+    return line.match(/^(\s*)/)[1].length;
+  };
+
+  const parseValue = (val) => {
+    const v = val.trim();
+    if (v === "true")  return true;
+    if (v === "false") return false;
+    if (v === "null" || v === "~" || v === "") return null;
+    if (/^-?\d+(\.\d+)?$/.test(v)) return Number(v);
+    if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
+      return v.slice(1,-1).replace(/\\"/g,'"').replace(/\\\\/g,'\\');
+    }
+    return v;
+  };
+
+  while (i < lines.length) {
+    const line = lines[i];
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) { i++; continue; }
+
+    const indent = getIndent(line);
+    if (indent < baseIndent) break;
+    if (indent > baseIndent) { i++; continue; }
+
+    // Sequence item
+    if (trimmed.startsWith("- ") || trimmed === "-") {
+      const rest = trimmed.slice(2).trim();
+      if (!Array.isArray(out)) {
+        // shouldn't happen in well-formed YAML
+        i++; continue;
+      }
+      if (!rest) {
+        // Block sequence item
+        const obj = {};
+        i++;
+        const subLines = [];
+        while (i < lines.length) {
+          const subLine = lines[i];
+          const subInd  = getIndent(subLine);
+          if (subInd === -1) { subLines.push(subLine); i++; continue; }
+          if (subInd <= indent) break;
+          subLines.push(subLine);
+          i++;
+        }
+        parseYAMLBlock(subLines, indent + 2, obj);
+        out.push(obj);
+        continue;
+      }
+      // Inline key: value after "-"
+      if (rest.includes(": ") || rest.endsWith(":")) {
+        const obj = {};
+        const [k, ...vParts] = rest.split(": ");
+        const v = vParts.join(": ");
+        if (v) obj[k] = parseValue(v);
+        else   obj[k] = null;
+        // Check for continuation lines
+        i++;
+        const subLines = [" ".repeat(indent + 2) + rest];
+        while (i < lines.length) {
+          const subLine = lines[i];
+          const subInd  = getIndent(subLine);
+          if (subInd === -1) { subLines.push(subLine); i++; continue; }
+          if (subInd <= indent) break;
+          subLines.push(subLine);
+          i++;
+        }
+        parseYAMLBlock(subLines.slice(1), indent + 2, obj);
+        out.push(obj);
+        continue;
+      }
+      out.push(parseValue(rest));
+      i++;
+      continue;
+    }
+
+    // Key: value mapping
+    const colonIdx = trimmed.indexOf(": ");
+    const colonEnd = trimmed.endsWith(":");
+    if (colonIdx !== -1 || colonEnd) {
+      const key = colonEnd ? trimmed.slice(0,-1) : trimmed.slice(0, colonIdx);
+      const rawVal = colonEnd ? "" : trimmed.slice(colonIdx + 2);
+
+      // Peek ahead for block value
+      const nextLines = [];
+      let j = i + 1;
+      while (j < lines.length) {
+        const nl = lines[j];
+        const ni = getIndent(nl);
+        if (ni === -1) { nextLines.push(nl); j++; continue; }
+        if (ni <= indent) break;
+        nextLines.push(nl);
+        j++;
+      }
+
+      if (!rawVal && nextLines.length > 0) {
+        const childIndent = getIndent(nextLines.find(l => getIndent(l) !== -1) || "");
+        // Is next block a sequence?
+        const firstNonEmpty = nextLines.find(l => l.trim() && !l.trim().startsWith("#"));
+        if (firstNonEmpty && firstNonEmpty.trim().startsWith("- ")) {
+          const arr = [];
+          parseYAMLBlock(nextLines, childIndent, arr);
+          out[key] = arr;
+        } else {
+          const obj = {};
+          parseYAMLBlock(nextLines, childIndent, obj);
+          out[key] = obj;
+        }
+        i = j;
+        continue;
+      }
+
+      // Block scalar: literal (|) or folded (>)
+      if (rawVal === "|" || rawVal === ">") {
+        const scalarLines = [];
+        let j2 = i + 1;
+        let scalarIndent = -1;
+        while (j2 < lines.length) {
+          const sl = lines[j2];
+          const si = getIndent(sl);
+          if (si === -1) { scalarLines.push(""); j2++; continue; }
+          if (scalarIndent === -1) scalarIndent = si;
+          if (si < scalarIndent) break;
+          scalarLines.push(sl.slice(scalarIndent));
+          j2++;
+        }
+        // Strip trailing empty lines, then join
+        while (scalarLines.length && scalarLines[scalarLines.length - 1] === "") scalarLines.pop();
+        out[key] = rawVal === ">" ? scalarLines.join(" ") : scalarLines.join("\n");
+        i = j2;
+        continue;
+      }
+
+      out[key] = parseValue(rawVal);
+      i++;
+      continue;
+    }
+
+    i++;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Modal helpers
+// ---------------------------------------------------------------------------
+
+function openModal(id)  { document.getElementById(id).classList.add("open"); }
+function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+
+// ---------------------------------------------------------------------------
+// Toast
+// ---------------------------------------------------------------------------
+
+function showToast(msg, isError = false) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast" + (isError ? " error" : "");
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2800);
+}
+
+// ---------------------------------------------------------------------------
+// Utility
+// ---------------------------------------------------------------------------
+
+function escHtml(s) {
+  return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+// ---------------------------------------------------------------------------
+// Wiring
+// ---------------------------------------------------------------------------
+
+document.getElementById("btn-add-group").addEventListener("click", addGroup);
+document.getElementById("btn-add-page").addEventListener("click", addPage);
+document.getElementById("btn-export").addEventListener("click", exportYAML);
+
+document.getElementById("survey-title-input").addEventListener("input", (e) => {
+  state.title = e.target.value;
+});
+
+document.getElementById("btn-description").addEventListener("click", () => {
+  document.getElementById("survey-description-input").value = state.description;
+  openModal("modal-description");
+  // Restore modal to description mode (it gets reused for option/row conditions)
+  document.querySelector("#modal-description h3").textContent = "Survey description";
+  const body = document.querySelector("#modal-description .field-group");
+  body.innerHTML = "";
+  const lbl = document.createElement("label");
+  lbl.className = "field-label";
+  lbl.textContent = "Description";
+  const ta = document.createElement("textarea");
+  ta.className = "field-input";
+  ta.id = "survey-description-input";
+  ta.rows = 4;
+  ta.placeholder = "Optional intro text…";
+  ta.value = state.description;
+  body.appendChild(lbl);
+  body.appendChild(ta);
+  document.querySelector("#modal-description .modal-actions").innerHTML =
+    `<button class="btn btn-primary" id="modal-desc-save">Save</button>`;
+  document.getElementById("modal-desc-save").onclick = () => {
+    state.description = document.getElementById("survey-description-input").value;
+    closeModal("modal-description");
+  };
+});
+
+document.getElementById("btn-import").addEventListener("click", () => {
+  document.getElementById("file-import").click();
+});
+
+document.getElementById("file-import").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => importYAML(ev.target.result);
+  reader.readAsText(file);
+  e.target.value = ""; // reset so same file can be re-imported
+});
+
+document.getElementById("modal-type-cancel").addEventListener("click", () => closeModal("modal-type"));
+
+// Close modals on overlay click
+document.querySelectorAll(".modal-overlay").forEach(overlay => {
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) closeModal(overlay.id);
+  });
+});
+
+document.getElementById("modal-desc-save").addEventListener("click", () => {
+  state.description = document.getElementById("survey-description-input").value;
+  closeModal("modal-description");
+});
+
+// ---------------------------------------------------------------------------
+// Init
+// ---------------------------------------------------------------------------
+
+renderSidebar();
+renderEditor();
+
+</script>
+</body>
+</html>
